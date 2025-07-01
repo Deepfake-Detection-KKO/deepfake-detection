@@ -1,0 +1,6 @@
+Deepfake-Eval-2024
+*.amltmp
+*.amltemp
+*.amlignore
+.ipynb_aml_checkpoints/
+.ipynb_checkpoints/
