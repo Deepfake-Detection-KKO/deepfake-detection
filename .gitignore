@@ -4,3 +4,11 @@ Deepfake-Eval-2024
 *.amlignore
 .ipynb_aml_checkpoints/
 .ipynb_checkpoints/
+
+# MacOS
+.DS_Store
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
