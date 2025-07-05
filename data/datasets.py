@@ -41,7 +41,7 @@ class DeepFakeDataset(Dataset):
             # Training transforms (includes randomization to augment data for each epoch)
             train_transform = transforms.Compose([
                 transforms.RandomResizedCrop(size=224, scale=(0.5, 1.0)), # Randomly crop image NOTE: size can be changed if not resnet / ViT
-                transforms.RandomAdjustSharpness(sharpness_factor=0.2, p=0.5), # Randomly change sharpness
+                # transforms.RandomAdjustSharpness(sharpness_factor=0.2, p=0.5), # Randomly change sharpness
                 transforms.ToTensor() # Convert to tensor
             ])
 
@@ -62,7 +62,7 @@ class DeepFakeDataset(Dataset):
             # Training transforms (includes randomization to augment data for each epoch)
             train_transform = transforms.Compose([
                 transforms.RandomResizedCrop(size=256, scale=(0.5, 1.0)),  # Randomly crop image
-                transforms.RandomAdjustSharpness(sharpness_factor=0.2, p=0.5), # Randomly change sharpness
+                # transforms.RandomAdjustSharpness(sharpness_factor=0.2, p=0.5), # Randomly change sharpness
                 base_transforms # This implicitly applies ToTensor and Normalize
             ])
 
