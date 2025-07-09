@@ -6,6 +6,8 @@ import pandas as pd
 from PIL import Image
 import torchvision.transforms as transforms
 from torchvision.models import ResNet50_Weights, ViT_B_32_Weights
+from transformers import AutoImageProcessor
+
 import random
 import numpy as np
 
@@ -20,14 +22,34 @@ if torch.mps.is_available():
     torch.mps.manual_seed(SEED) 
 
 class DeepFakeDataset(Dataset):
-    def __init__(self, metadata_path, image_dir_path, model_type, is_train, transform = None, target_transform = None):
+    def __init__(self, metadata_path: str, image_dir_path: str, model_type: str, is_train: bool = True):
+        """
+        Dataset subclass which preprocesses deepfakes
+        
+        Parameters
+        ----------
+            metadata_path: str
+                file path for metadata csv
+            image_dir_path: str
+                path for directory contain images
+            model_type: {'ResNet', 'ViT', 'CvT'}
+                type of vison model
+            is_train: bool, default = True
+                whether the dataset is to be used for training and development or testing
+        """
         self.metadata = pd.read_csv(metadata_path)
         self.image_dir_path = image_dir_path
         self.model_type = model_type
         self.is_train = is_train
-        # self.transform = transform
-        # self.target_transform = target_transform
-    
+
+        # load image preprocessors for pretrained models
+        if self.model_type == 'ResNet':
+            self.base_transforms = ResNet50_Weights.DEFAULT.transforms()
+        elif self.model_type == 'ViT':
+            self.base_transforms = ViT_B_32_Weights.DEFAULT.transforms()
+        elif self.model_type == 'CvT':
+            self.base_transforms = lambda x: AutoImageProcessor.from_pretrained("microsoft/cvt-13")(x, return_tensors = "pt")['pixel_values'].squeeze()
+        
     def __len__(self):
         return len(self.metadata)
     
@@ -37,7 +59,7 @@ class DeepFakeDataset(Dataset):
         image = Image.open(image_path)
         image = image.convert("RGB")
 
-        if self.model_type not in ['ResNet', 'ViT']:
+        if self.model_type not in ['ResNet', 'ViT', 'CvT']:
             # Training transforms (includes randomization to augment data for each epoch)
             train_transform = transforms.Compose([
                 transforms.RandomResizedCrop(size=224, scale=(0.5, 1.0)), # Randomly crop image NOTE: size can be changed if not resnet / ViT
@@ -52,22 +74,15 @@ class DeepFakeDataset(Dataset):
                 transforms.ToTensor()
             ])
         else:
-            if self.model_type == 'ResNet': # ResNet default transformation
-                weights = ResNet50_Weights.DEFAULT 
-            elif self.model_type == 'ViT': # ViT default transformation
-                weights = ViT_B_32_Weights
-
-            base_transforms = weights.transforms() # Base transform from pretrained model, includes ToTensor and Normalize
-
             # Training transforms (includes randomization to augment data for each epoch)
             train_transform = transforms.Compose([
                 transforms.RandomResizedCrop(size=256, scale=(0.5, 1.0)),  # Randomly crop image
                 # transforms.RandomAdjustSharpness(sharpness_factor=0.2, p=0.5), # Randomly change sharpness
-                base_transforms # This implicitly applies ToTensor and Normalize
+                self.base_transforms # This implicitly applies ToTensor and Normalize
             ])
 
             # Validation / testing transforms (does not include randomization)
-            val_transform = base_transforms
+            val_transform = self.base_transforms
         
         if self.is_train:
             image_tensor = train_transform(image)
