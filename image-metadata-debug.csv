@@ -1,0 +1,201 @@
+Filename,Date,Ground Truth,Public Comments,Finetuning Set
+xVGSYPspFIdtarVQ_jMgYKSwSZ4.jpg,########,Real,,Train
+49AAvO9SQ8A2LVnkQic3IFYsCSs.jpg,########,Fake,Self proclaimed fake as noted on image.,Train
+c2Oc9UThHcQ8gE0Xj_rRwUtopbU.jpg,########,Real,,Test
+9EfqQwHjCiYsA-F7ks-KNObg_QI.jpg,########,Fake,,Train
+yLcuGSv5hwEnrySIsUJKFTLwNxI.jpg,########,Real,Known photo,Train
+dbKnW3dkseGop2zfywnLgrCkMfA.jpg,########,Fake,,Test
+1EsWCEdLRC2eH2qpfPvRip_v8PA.jpg,########,Fake,obvious,Test
+mfqO8Ydzdugv8iAc7gzLVQp64a8.jpg,9/9/2024,Real,https://www.townandcountrymag.com/society/tradition/a62117616/kate-middleton-cancer-free-return-to-work-details/,Test
+BncxYZzaJvKxoMGEklwgznGFjOM.png,8/6/2024,Fake,deepfake subreddit,Train
+8HiiOxxM_K0gKkopVgqTPNCJtgU.jpg,########,Real,,Train
+3wC0eCNXlt8Pst7UsZYXV645YLk.jpg,3/1/2024,Real,,Test
+g1Z9xTTs_Bj8azY2ZqOB5mVH_FU.jpg,########,Fake,commentator note,Train
+wHB0mXP1Vp3P7hCGlJqhueF5vL4.jpg,########,Fake,Ideogram test,Test
+O_wL5aS3XfNZ9HnYUqxUbOFuQw8.jpg,9/9/2024,Fake,,Train
+URrphLvZcr7ZTtW6SmN0EEKlZfU.jpg,########,Real,https://www.boredpanda.com/fake-news-photos-viral-photoshop/ (in 2019 so before diffusion tools entered photoshop),Train
+hu-MF1k4lvbrLW_qF6f0K3LUxUo.jpg,########,Fake,https://www.snopes.com/fact-check/harris-false-escort-photos/,Train
+T7dHWXqcvn9lca7wqaLM81qf6vE.jpg,########,Fake,Ideogram test,Train
+PlWHojLgs-ojRDMFLaUzXf5df9I.png,7/5/2024,Real,https://www.tiktok.com/@garybreckashorts/video/7230497668915678491,Train
+tPBCeEd62VvK9voY_aF_hftQ00U.jpg,3/1/2024,Real,,Test
+RLUFMGWGkf_F-dfQlJ67BMkw0Qw.jpg,########,Fake,,Train
+7PjP0Xrt41CeYfFUawqU0I7gc9Y.jpg,########,Fake,Source fact check BBC https://www.jpost.com/business-and-innovation/article-816851,Train
+_4Gwus9aLO7bHoLIjCvKFEEBS0s.jpg,########,Real,,Test
+B6IoheuMIS3Uujk6p9EpNGqT_I0.jpg,########,Fake,,Test
+8nv_C8LDmloOXM2UOQZVfwkiv80.png,########,Fake,Clear editing of faces - https://www.theguardian.com/culture/gallery/2023/jun/30/a-history-of-living-conditions-in-the-east-end-in-pictures,Test
+jhZRB9SJSKI5oiozTNG_jImWt1c.jpg,########,Fake,If you look closely at the image you will see it is digitally created,Train
+am3ie1TsuTcmPosA55VFp-aRBIk.jpeg,########,Real,belived real based on exact matches here: https://lens.google.com/search?ep=gsbubb&hl=en&re=df&p=AbrfA8pl-OO5Ur4bYmwX2XtBillm7zTZ-7Y5tZqQ2-TesG5UGAzzaqYp6RPoFI-uzRlqhBO8VKCnvI21zEMy27V0IBqMFM2CXHeC1N59ThHo2pPj6SKl8lRmBGCCOgHlwLkqJwgDiieEyNJcy6Wxsd0gozhVYZit4a35UEHigXKBAlUap4MCycAtFzwYvgWGaPNsD9q49SFUXSpKsA%3D%3D#lns=W251bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLDEsIkVrY0tKR1pqTlRWaU5EWTRMV0V4TmpFdE5EazJNUzA0WVdNeExXTmtNV1kyTTJNeU5XTTBPQklmWXpkcVdUYzVVbEI0YkRCVWEwaDRiR3BST0hJemVGOXZVRXBYVXkxU1p3PT0iLG51bGwsbnVsbCxbW251bGwsbnVsbCwiaXAtNCJdLFsiZTY2YTdmYWEtZDliOS00Y2IxLWI0NDQtYTQyMzFhZTllM2ViIl1dLG51bGwsbnVsbCxudWxsLFtudWxsLG51bGwsW11dXQ==,Test
+o2ijPXHA6mG1Oz67dapzTyAmOgI.jpg,########,Real,,Train
+5s8g_7LCvNvOzTiBk549-ZcAw0I.webp,########,Fake,"Image has an almost cartoonish feel, digitally maniputated",Train
+IlorYFLmi4Oy3zQZZKoP-lYm3bY.jpg,########,Fake,,Test
+p7T7LgFUJGWjM36yW_cIAX9DzR0.jpg,########,Fake,,Train
+cIXdrISDDpFyA6xzRu33Zz8adzU.jpg,########,Real,https://x.com/taylorswift13/status/1313938080290803715?lang=en,Test
+XD5w4czHH4t1r1753cCi7B2avWA.jpg,########,Real,,Train
+8SNwRrTvFe5yEOcm8_Qc2K7QfXY.jpg,7/2/2024,Fake,https://observers.france24.com/en/ai-generated-image-of-a-wounded-three-legged-man-in-gaza-how-a-real-photo-was-doctored,Train
+IytMS68JNm89x_75oGND62CJ3ds.jpg,########,Real,,Train
+8HqvvL29z3vCRBOcveJmuCli1DE.jpg,########,Fake,https://www.yahoo.com/news/fact-check-photo-trump-ear-185100822.html,Test
+1SkNGfRnN3YRVtV_-aVKGxmDzmM.jpeg,########,Real,https://www.nytimes.com/2008/10/16/us/politics/16debate.html,Train
+qLavKgO2Fp-5DiTAlGD-n0A4wOI.jpg,########,Real,https://x.com/DrBiden/status/1810377196516602328,Train
+2tR5kwJ52E21yf1baR_MknbzGNk.jpg,########,Real,uploaded from CNN,Train
+DP1-Z4n5eKBdzin0c0672kPnTmw.webp,9/3/2024,Fake,,Test
+hcuC1u9ATIHlc2vLeYiOErOvEL0.jpeg,########,Fake,self-proclaimed in text at the bottom of image,Train
+O8lCDl6qbHl7gjOWQpiEu91aNZ8.webp,########,Fake,https://prompthero.com/search?q=Japanese+girl Prompt Hero is an AI image generation site,Train
+4kV2qEYCaArQ1TCarCy7sdf6Jes.jpg,########,Fake,,Train
+GDEcpVSXO_gnehUhSWWr3TScV_4.jpg,9/4/2024,Fake,,Test
+Z1wpXbzTsrZp3l9-s39cBActg28.jpeg,########,Fake,Image has an almost cartoonish quality to it common in AI photos,Test
+_GVQGtVmGqJwFg4zn0VOqvR1VOk.jpg,########,Real,,Test
+ENDqYjLIoruuAZtdBz1SwVnHENo.jpg,########,Fake,There is no such netflix series. Self proclaimed AI creation https://www.reddit.com/r/leonardoai/comments/18s1wba/morgan_freeman_as_pushkin/,Test
+Joz0HkDu1FRJuz_ylutkYMyOzdM.jpg,########,Real,AP Photo/Salim Dawood,Train
+UhMiklDTDfzCh3QXySGrHauWiNc.jpg,########,Real,https://www.washingtonpost.com/history/2020/08/19/nanny-maroons-kamala-slavery-jamaica/,Test
+CPkXxhQSZEP3-qJf-vfwJkLyNPQ.jpg,9/4/2024,Fake,,Train
+dZYR3ayssB4gpB5ehsaULrtG51U.webp,########,Real,https://www.gettyimages.com/detail/news-photo/republican-presidential-candidate-sen-john-mccain-and-news-photo/83169389,Test
+jGJI1KVYP9WQ2Fpep3JibNyOG8o.jpeg,8/7/2024,Real,,Test
+QuHmxK0R7WWqJsNn0RVUp--HKAg.jpg,7/5/2024,Real,https://www.hindustanmetro.com/meet-one-the-renowned-ethical-hacker-from-guwahati-kunal-das/,Test
+iLU7ZKyqd3axx0hOUSaDqfD_TRk.jpg,########,Real,https://www.vogue.co.uk/article/meghan-markle-coords-colombia,Test
+mY7qpROTgeZSWEvNbLg0l1Fx47Q.jpeg,########,Fake,#7 in fake photos https://www.dailyo.in/visualstories/webstories/15-totally-fake-photos-of-celebs-28368-28-03-2023,Test
+swORFfrTtNErsnWwLtu3ufIqy5E.jpg,########,Real,,Train
+Jf8ZFB0u7ItcFSrFx70pt-RCMMk.jpg,########,Real,Trump baseline photo,Train
+i29gZMlEqUtYK2BSV3I9c02Y9-0.jpg,########,Fake,"AI generated photo, found previously as well",Train
+r5S2oH9bNIwdMm1I706iBfhjfQA.jpg,########,Fake,you can see the bit of red left from the photoshop of the original in his eyeglasses: https://www.tagesschau.de/archiv,Train
+IGuypE97__z1t2ML1keW08bW2Po.jpg,########,Fake,self proclaimed,Test
+DZostff9vWHfYH8qvlFHPkRgYVE.jpg,########,Fake,Self-proclaimed,Test
+I2TKVLePhJi8g5lEYPHNl6t2K2Q.jpg,5/7/2024,Real,https://www.nytimes.com/2024/07/09/us/politics/aoc-biden-2024-election.html,Train
+KHU7Wv5IvW20NZpJ0oDq0rR0iwo.png,########,Real,https://reutersinstitute.politics.ox.ac.uk/sites/default/files/2020-11/Nielsen_et_al_COVID-19_Pandemics_Impact_on_Independent_News_Media_FINAL.pdf,Train
+td93qZQPlrE3bygkRENHMhlqNpo.png,########,Fake,,Test
+guztSIBa3kqQQTqgxnIzcMn9nKc.jpg,########,Fake,https://t.co/PFz3rONMvZ,Train
+fFSnUz_wbXp6lo3cyuMQeSrP1xg.jpg,########,Fake,,Test
+fgiTlQ2fJK2OY3Zad3pYh7z3G6Q.jpeg,########,Fake,,Train
+pfypcrnsSUjtTGcHHD_PPf0cTn8.png,########,Fake,,Test
+ALB7Qh8fc27annB-rhum6wSyVCw.jpg,########,Fake,Image has a cartoon like quality to it,Test
+Wav34R7Y1wc3_oKFkgcO7VrLwvQ.jpeg,########,Fake,,Test
+8bur7i3ULsDQptSUsx_27VbCvG4.jpg,########,Real,https://www.gettyimages.co.uk/detail/news-photo/recording-artist-the-weeknd-winner-of-favorite-soul-r-b-news-photo/498364380,Test
+giizxnw0NVv28KiDut13tBaRhm8.jpg,########,Real,https://x.com/twhitfill/status/1822687844378308917,Train
+96CJ7dNHwu1MEcouX9JyGhYeUuA.png,########,Fake,https://repositorio.uam.es/bitstream/10486/702969/1/tolosana_deepfakes_InfFus_2020_pre.pdf,Train
+8TwzN8XITJNcI2ps2jOTWlIjfcQ.webp,########,Fake,obvious,Test
+w7GE6tQG-tardHZvxyP7daNbSoM.png,########,Fake,self proclaimed,Train
+EVFKIPy85Q2ofOmAQyIc3QLpwzU.jpg,########,Real,Confirmed by AP news source,Train
+kihIXcsK3SW7AwCxl-fMpgAK0fk.jpg,########,Fake,,Train
+gFWRH4mBsXeal1LQql_M27VotN8.jpg,########,Real,From this site: https://www.reuters.com/pictures/defining-photos-trump-presidency-2023-08-15/,Train
+3x1AbMzN5SUZTLgyWYgr1ekFpJ0.webp,########,Real,eval,Train
+wV_jgZuuugOGA4bswkohX8m1VJo.jpg,########,Real,NYT and more posted,Test
+0-CAx-4yjLbbihiybJdjA6TMr4s.jpg,########,Real,photo credit https://www.msn.com/en-au/news/other/angela-carini-issues-apology-to-imane-khelif-after-olympic-boxing-controversy/ar-BB1r5IOr,Test
+afqHQEly7ejM8wnE5Den8mfN0Lg.png,8/8/2024,Fake,https://www.bellingcat.com/news/2023/10/06/the-folly-of-dall-e-how-4chan-is-abusing-bings-new-image-model/,Test
+kP-qE8hYoSywv9czeAckwMoGbcg.jpg,########,Fake,from flux,Test
+hj4ac0-d84RWBYbqlsYzoinIqfE.jpg,########,Real,official x account https://x.com/mayemusk,Train
+OK2W1H4NvN5WS1GAWJKQ9HjEyTA.jpg,########,Real,https://www.seattletimes.com/nation-world/nation/ferguson-police-to-release-body-camera-footage-of-protest-where-officer-was-badly-hurt/,Test
+h8DpaTUNym0u-Boy866eIyD4D00.png,########,Fake,,Train
+NyIrw75oXKd_64iYf8x6T79POCE.jpg,4/2/2024,Fake,source: https://www.nytimes.com/interactive/2023/06/28/technology/ai-detection-midjourney-stable-diffusion-dalle.html,Test
+xHurhgBWe8DCubL4kBORxycwyS8.jpg,########,Fake,cartoon,Train
+A7M7QWQ7mbruq4E4ewcILprCysM.jpeg,########,Fake,,Train
+i3iSe90CM6WWf_eb6o8rKwMLuOg.jpg,########,Real,,Test
+x6ReGaz8h6-lxTyJNK3doO1zKEs.jpeg,########,Real,Shutterstock,Test
+_I_Kxc2xWF887iCwwFrCBvgZOPo.jpg,########,Fake,Obvious because of overly smooth texture,Train
+Z9Y4R-aAjmM-Pgx2yb62Og5eqy4.jpg,########,Real,,Train
+46VYf6mBeWqQLi2n9kSp8rKZ2VQ.jpg,########,Fake,,Train
+xqrFAk-lfcKBuIYQxb9MpPXmrPk.jpeg,########,Fake,known fake of Trump having a meeting with his assassin and the FBI - https://www.snopes.com/tag/fbi/,Test
+h3qwUn0RnBzoYMMeRePGaCM9KzQ.jpg,########,Fake,,Test
+AhnLQkoPrpTWFMgBPTpV3bLBEsU.jpeg,########,Real,https://www.buzzfeednews.com/article/tasneemnashrulla/trump-epstein-party-tape-mar-a-lago-women,Train
+owIXzMkTknWfabP3KudYVYyV0OA.jpg,########,Real,https://www.forbes.com/sites/petersuciu/2024/08/19/trump-shared-fake-ai-taylor-swift-endorsement-it-wont-end-well/,Train
+ecF04NcfBxKpRpI5PF5l-GGsj6A.jpg,########,Real,harris' hand is touching the bibles https://www.politifact.com/factchecks/2021/jan/22/facebook-posts/kamala-harris-was-sworn-stack-bibles-not-clutch-pu/,Test
+GuQT-qW6aUoeaVGfmCKZRokxCo0.jpg,########,Fake,commentator note,Train
+rLZo_KW1iIiAgNVpxdH9Mx13I0k.jpg,########,Real,https://www.reuters.com/fact-check/who-didnt-admit-monkeypox-is-side-effect-pfizers-covid-vaccine-2024-10-30/,Train
+SILfQR7zaVPdRimCitoLRmqW8bY.webp,8/7/2024,Real,real - snopes,Test
+nvkRfHDJuMLb8DueE00nFsuHN5Q.jpg,########,Real,,Test
+gxonYolYXUg76SPoSEsBCAXOy48.jpeg,9/4/2024,Fake,https://pesacheck.org/fake-these-images-of-elon-musk-with-robot-wives-are-ai-generated-6e182fe88089,Train
+f0cCmTCh3MSYneIgeJZk4Y712Pw.jpg,########,Real,Photo cred = Ukraine Foreign Ministry Affairs,Test
+iIP4hwWGg2l_s_r_DHQ1Y2zKx1I.jpg,########,Real,,Train
+5sgp2faELmAT0UULO2t6djJZLag.webp,9/3/2024,Fake,,Train
+FWf_yTtn5QyTg31duQ-x_AVj6dA.jpg,########,Real,,Test
+i5CD_nsCNpQXhpZHxkJgtO6nDlk.jpg,########,Real,,Train
+DkSP0NiUg8pLwHkNC8cc0YOmkcE.jpg,########,Fake,https://www.freepik.com/premium-ai-image/busting-stereotypes-justin-trudeau-unleashing-his-flamboyant-dance-moves-as-lgbtq-ally_162645869.htm,Train
+P5bnILKxhog3HzRzVsxJ9DFlHNQ.jpg,########,Fake,,Train
+lyTReYcnpClD7ylpHXxKxhwquFE.png,########,Fake,,Test
+LeX4_DYhVDweFJgz0A0_aj9gRnk.jpeg,########,Fake,obvious,Train
+wX1kq8YfJvLSknBmclaDKCv8y04.jpg,########,Fake,"obvious because the skin is overly smooth and body parts not proportion. the hair appears slightly blurred or smoothed out, and lacks the realistic texture that would typically be seen in a high-resolution photo.",Train
+ME4-kFZKk3krQaLhDszFbu1nGr0.webp,########,Fake,"Image has an almost cartoonish feel, digitally maniputated",Test
+aR9xQ8MjN5qaOXwGF6MstX5sUjY.jpg,9/4/2024,Fake,obvious,Train
+NnBBo6KTAtz9HWUay0C43YSBHYc.webp,8/7/2024,Fake,Lead stories - fake,Test
+ebEqSVsmTucErD18L7_08exOAEs.jpg,########,Real,photo credit here: https://www.theepochtimes.com/china/in-2019-the-chinese-regime-is-restructuring-the-way-it-handles-falun-gong-2751036,Train
+yh7ufAht0RWR8lp1UhRV07u82VY.jpg,########,Real,https://www.gov.si/novice/2024-10-04-okrogla-miza-nova-policijska-pooblastila-da-ali-ne/,Train
+kCtC90IGJ4phms-rAZZHpWa32Sk.jpg,########,Fake,Ideogram test,Test
+wWjMnYgfA42-Vfff8vHgOYbEGQA.jpg,########,Real,https://www.bbc.com/news/live/cr54lyg2j8zt?page=2,Train
+owgTgV5IEE-ABLZ6l6fevb7gUrM.jpg,########,Fake,obvious,Train
+J8OHmLlORojiZsktvw5fLFxOGVY.jpg,########,Fake,"The real photo says ""Stand with Gaza"" - https://www.indiatoday.in/world/story/greta-thunberg-deletes-stand-with-gaza-photo-stuffed-toy-anti-semitic-2451733-2023-10-20, https://www.ndtv.com/world-news/greta-thunbergs-stand-with-gaza-post-draws-social-media-backlash-4500218",Train
+VJFZCwwggpAYmWAMnLjm5ozX_yg.jpg,3/4/2024,Fake,,Train
+wYULQ4CguNrJ1sIM5JF6QSa2UPA.jpg,########,Fake,,Train
+lNnG6ft7DNjzmwin-u-HHSSnpAA.jpg,########,Fake,,Train
+jvMh2GHGMEqd-6qeaHkFpCJfOEo.jpg,########,Fake,,Train
+uuhZi5SLiev8UyYubM7i5g400C4.jpg,########,Fake,Clarity of skin and facial features. Blurred background.,Train
+C8LP24OkmWwRGL0hLrSDqvJkfYk.jpg,########,Fake,,Test
+1YqybghCsOj9dbpcpCIkW5shZWw.jpeg,########,Fake,https://www.thetimes.com/article/labour-mp-apologises-for-deepfake-image-of-rishi-sunak-with-pint-0ftbx6d57,Train
+lmvLHezoTsRfegM4yyuy6XyWx4A.jpeg,########,Fake,"If you look at the fingers holding the document, they seem a bit off and they aren't adequately holding the document so it doesn't drop. Also, it is highly unlikely a N Korean would have N Korean documents on them at the front.",Train
+MdhFx6JIXqqXmO1l3J5cyIpsXco.jpg,########,Fake,obvious,Test
+Mz_TUv54tDL5tS1cb-tfnjzxEs8.jpg,########,Real,AP photo https://www.thetimes.com/uk/politics/article/pleasure-boat-sighting-suggests-kim-jong-un-is-alive-and-lying-low-3dws5vw5f,Train
+_bNUsUI8jpNL-B6D8HYSJfW7yfg.webp,########,Real,,Train
+1VAyDMuh_z7mt0wC3IOI7ZaqiqQ.jpg,########,Fake,,Train
+b6u9NDCGmLN8ZBZJSc1AhtPh3rc.png,4/9/2024,Fake,still from known fake video,Train
+34k-zARcqK4DQclx8M7WiF1yG7g.jpg,########,Real,,Test
+3_2EeB07vWOa8ZyMlTVA8T21HyU.jpg,########,Real,https://www.jpost.com/israel-news/article-825638,Test
+mxp0KuelRUGOvuk3-uw2RBNg4o8.jpg,########,Real,,Train
+9OimgSEpu-KhDLANl8zFoRSNsQ0.png,########,Fake,,Train
+4zog0oVrQ3_dBRZsuqIvSJUNQsI.jpg,########,Fake,https://www.forbes.com/sites/mattnovak/2023/11/05/viral-video-of-actress-rashmika-mandanna-actually-ai-deepfake/,Train
+AQX9VQGzH_muIG7LXTQV8RPG1HY.jpg,8/1/2024,Real,https://www.koreaboo.com/news/kim-ye-ji-korean-shooter-2024-paris-olympics-viral-badass-vibes/,Test
+VLArfUoCZF5bke_ASs1uB_Vyu2I.jpg,########,Real,,Train
+xH_2t-qqiYKmf6A41JLIqpjTO00.jpeg,########,Fake,obvious,Test
+8pSRUaAZLJYEyrhfPpkEOYuOoU4.jpg,########,Fake,images are digitally altered and photoshopped,Train
+sk4eVzS8Qfw2ersBoJ3N8DmBF8Y.jpg,########,Fake,https://www.gettyimages.co.jp/detail/%E3%83%8B%E3%83%A5%E3%83%BC%E3%82%B9%E5%86%99%E7%9C%9F/trump-supporters-clash-with-police-and-security-forces-as-they-%E3%83%8B%E3%83%A5%E3%83%BC%E3%82%B9%E5%86%99%E7%9C%9F/1230456025,Test
+2C8YYBQfNU1RP0awdj0OBJ48XJw.webp,########,Fake,self-proclaimed,Train
+83X1oI6n4RlRNypbMJGZnfEVXd4.jpg,########,Fake,obvious,Train
+x97gfXtK-C0HvhA6YxjCp4cGRuQ.jpg,########,Real,,Test
+ponIxh9XOZggT6tuaYDQqo7VuBA.jpg,9/9/2024,Real,https://www.townandcountrymag.com/society/tradition/a62117149/kate-middleton-veronica-beard-dress-cancer-free-announcement/,Train
+BzaXRl61H6kApNMbIhZfdbQKkeA.png,########,Fake,https://guardian.ng/opinion/letters/how-ai-is-blurring-lines-between-reality-and-fiction/,Train
+0AEukq0qAvoKrHpJHeHF-9-Dhho.png,########,Fake,https://t.co/1AkSW7wcTd,Train
+SnjTXp9tiGbCFqfn4ZgRJnq9cac.jpeg,########,Fake,,Train
+uAEursgRbtvVcLcLzWYtbXEzDWA.jpg,########,Real,https://www.c-span.org/video/?532415-1/hunter-biden-statement-subpoena-investigation,Train
+uLrkPVnciN0Kphj9_4vzrlwwV0Y.jpg,########,Real,https://www.abc27.com/international/ap-us-diplomat-says-intelligence-from-five-eyes-nations-helped-canada-to-link-india-to-sikhs-killing/,Test
+cwOd0kDC_z0IyJG3Bj1HcFYNnto.png,########,Fake,There are no known images of Mike Tyson wearing the Palestinian flag,Train
+6pe0g1Wg9RCa0xKx7vlo5PNFsVg.jpg,3/6/2024,Real,,Train
+tPah9QLojdqK3i-jkUYJY6q3nK0.jpg,########,Real,https://leadstories.com/hoax-alert/2024/08/fact-check-yokasi-maogo-is-not-name-of-any-olympic-swimmer-from-japan-baseless-pun-in-spanish.html,Test
+ampS-OOf8MCMFj1NYvfd1i6DCJc.jpg,########,Real,,Train
+BQ18s5DBxZSHshZic0DfdAkICbM.jpg,########,Fake,,Test
+B-FCzwqpQ-yurupqL1Mad7YHVeM.jpeg,########,Fake,obvious,Test
+OnJL31Cq8qIiDz-hdk-3KqOZCvU.jpg,########,Fake,confirmed ai,Train
+HdwR2XMS-EzQ5cw2l3i9DxfEFYE.jpg,9/4/2024,Fake,,Test
+mfhNvsUi6JOGkeYl9YCcQnHKjW0.jpg,########,Real,Reported on Yahoo News https://www.yahoo.com/news/mexico-votes-election-likely-choose-221044549.html,Train
+v4rVvnmfyW1HTRCONy5Lddn7KbU.jpg,########,Fake,https://www.businesstoday.in/visualstories/technology/ai-artist-shows-how-elon-musk-mukesh-ambani-and-more-rich-people-will-look-like-if-they-were-poor-net-worth-30439-10-04-2023,Train
+IZUbGV42_b1dZEHJj0K4FMVE2VI.webp,########,Real,https://www.cambridge.org/core/journals/prehospital-and-disaster-medicine/article/ahmadreza-djalali-md-phd-is-dying/D655A93377D6225ADEFA229E74831644,Test
+7th-ciwFCg59ViZlWFqHJpHtRYg.jpg,9/3/2024,Fake,https://pesacheck.org/fake-these-images-of-elon-musk-with-robot-wives-are-ai-generated-6e182fe88089,Test
+cM6q1idHHrQ8pr37jnQkjSN_ZXQ.jpg,9/5/2024,Fake,,Train
+DCqrmk08pEY7h795gOd8BVloHiQ.jpeg,########,Fake,,Test
+3aetiVnSzJaEIwwew_faIWyWo5Y.jpg,########,Fake,,Test
+b9jv9Gs6j-UaSUx9nUjUy3mOpZg.jpg,########,Real,https://enewspaper.latimes.com/infinity/article_share.aspx?guid=30536435-0421-4904-af7c-a36153989b68,Train
+fjIZnVd-o8NdM9jRza3cYtfZi6c.jpg,########,Real,https://www.cnn.com/2024/10/27/uk/prince-william-diana-photos-homelessness-intl/index.html,Test
+BpeTNvccvGLim007m_Y8gURieMw.png,########,Fake,https://www.thetimes.com/article/labour-mp-apologises-for-deepfake-image-of-rishi-sunak-with-pint-0ftbx6d57,Train
+oUNImgHz9r1McrlYFXhP9E-2DE0.png,########,Fake,self-proclaimed - https://www.reddit.com/r/midjourney/comments/1api2a0/how_it_feels_to_be_a_country_girl/,Test
+20moenb_kqMRgcrFwcUEA6EaUEY.jpg,########,Fake,,Test
+SLLqMGcWe2Ud1axfixm-aiYXNfo.jpg,########,Fake,,Train
+zOtthWcRq0Y62wkfwmfNds4xuLY.jpg,########,Fake,self proclaimed,Test
+25JR7kJZ83PHruJy5dRv0i-yPL8.jpg,########,Real,,Train
+xuYPsjJhaZNNiu_HUOS__u5EdNQ.jpg,3/1/2024,Fake,,Train
+gP9TpNTIGlKozpXYnk1AYWIMzHs.jpeg,########,Fake,,Test
+l0ApFpFNkxaHXxatv0rWV1DfV1o.jpg,########,Real,Image deemed real on originating site ,Test
+aY12VZICFHLFSvH6OO0di1AZXEM.png,########,Fake,,Test
+hUV_O0Rsv6k72uSssvHZaqpc18s.jpg,########,Fake,AI generated image,Train
+WcxID4PPaTQw8YQN7dIXpTamr8Q.jpg,########,Real,,Train
+n8O0VjpNAoOEF9HwLVifnR8RY7o.jpg,########,Real,,Train
+8g05mhZTsCBqPXd48uyrfhKTWk0.jpg,########,Fake,original: https://degeshop.com/product/simone-biles-goat-paris-2024-olympics-shirt/https://degeshop.com/product/simone-biles-goat-paris-2024-olympics-shirt/,Test
+iXviwJlWFNv_iixTCP8VULv0z7I.jpg,########,Real,,Test
+qQ5Buzverdw8SiiuXiawuYz5CNg.png,9/3/2024,Fake,,Test
+MQgQcDIIEzxZ1MAiyIXnpzyTow0.jpg,########,Real,,Train
+i0qaudSlRtccAD-v5QWf3gpUzjo.jpg,########,Fake,,Train
+IDRqYfhIQHAexRVlP8wL51bll44.png,########,Fake,official mug shot: https://apnews.com/article/mug-shot-donald-trump-indictment-839920116a244df3e55bdedf33820a80,Train
+iTu-J0tRmT8kWiqpYuQxkph2hP4.jpg,########,Fake,There is a missing finger and an extra hand in the picture,Train
+NagHcTKsiOrg-nMuQz10__RB3Jk.jpg,########,Real,eval,Test
+vgRQ07g8ymjZ6YGdPGai93Ig3Yo.jpg,########,Fake,obvious,Test
+3Rw5E3tCICHg9ReofSw23G0B_ZQ.jpg,########,Fake,,Train
+AlsN4dmz-o5HzTHRUHYNR_aPVio.jpg,########,Fake,ai,Train
+wEoa1r2YRL6DNd1ZHhBk8VwBXdA.jpg,########,Fake,Obvious because the image is unusually smooth and lighting is uneven,Test
+ZFtm08iXsfl_h2s6aQc7hWqr-aM.jpeg,########,Real,https://www.nbcnews.com/news/photo/kim-jong-un-portraits-n573026,Train
+fecdZI6qv6ryvLygGHTJIWbOc3c.webp,6/6/2024,Fake,https://www.bloomberg.com/news/features/2023-07-11/chatgpt-ai-boom-makes-political-dirty-tricks-easier-and-cheaper?embedded-checkout=true,Train
+YZA5nhY8RZLUFO6-KHoRJ-qLtn0.jpg,########,Fake,,Test
+Lw4-HjR0XDikuG3OXYIwLmCQFKg.jpg,########,Real,https://www.theguardian.com/us-news/2024/sep/24/missouri-executes-marcellus-williams,Test
