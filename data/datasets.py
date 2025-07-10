@@ -48,6 +48,31 @@ class DeepFakeDataset(Dataset):
             self.base_transforms = ViT_B_32_Weights.DEFAULT.transforms()
         elif self.model_type == 'ConvNeXt':
             self.base_transforms = ConvNeXt_Base_Weights.DEFAULT.transforms()
+
+        if self.model_type not in ['ResNet', 'ViT', 'ConvNeXt']:
+            # Training transforms (includes randomization to augment data for each epoch)
+            self.train_transform = transforms.Compose([
+                transforms.RandomResizedCrop(size=224, scale=(0.5, 1.0)), # Randomly crop image NOTE: size can be changed if not resnet / ViT
+                # transforms.RandomAdjustSharpness(sharpness_factor=0.2, p=0.5), # Randomly change sharpness
+                transforms.ToTensor() # Convert to tensor
+            ])
+
+            # Validation / testing transforms (does not include randomization)
+            self.val_transform = transforms.Compose([
+                transforms.Resize(232), # Resize short side (matches Resnet but can be changed)
+                transforms.CenterCrop(224), # Extract center of image
+                transforms.ToTensor()
+            ])
+        else:
+            # Training transforms (includes randomization to augment data for each epoch)
+            self.train_transform = transforms.Compose([
+                transforms.RandomResizedCrop(size=256, scale=(0.5, 1.0)),  # Randomly crop image
+                # transforms.RandomAdjustSharpness(sharpness_factor=0.2, p=0.5), # Randomly change sharpness
+                self.base_transforms # This implicitly applies ToTensor and Normalize
+            ])
+
+            # Validation / testing transforms (does not include randomization)
+            self.val_transform = self.base_transforms
         
     def __len__(self):
         return len(self.metadata)
@@ -57,35 +82,10 @@ class DeepFakeDataset(Dataset):
         image_path = os.path.join(self.image_dir_path, image_metadata_record['Filename'])
         image = Image.open(image_path)
         image = image.convert("RGB")
-
-        if self.model_type not in ['ResNet', 'ViT', 'ConvNeXt']:
-            # Training transforms (includes randomization to augment data for each epoch)
-            train_transform = transforms.Compose([
-                transforms.RandomResizedCrop(size=224, scale=(0.5, 1.0)), # Randomly crop image NOTE: size can be changed if not resnet / ViT
-                # transforms.RandomAdjustSharpness(sharpness_factor=0.2, p=0.5), # Randomly change sharpness
-                transforms.ToTensor() # Convert to tensor
-            ])
-
-            # Validation / testing transforms (does not include randomization)
-            val_transform = transforms.Compose([
-                transforms.Resize(232), # Resize short side (matches Resnet but can be changed)
-                transforms.CenterCrop(224), # Extract center of image
-                transforms.ToTensor()
-            ])
-        else:
-            # Training transforms (includes randomization to augment data for each epoch)
-            train_transform = transforms.Compose([
-                transforms.RandomResizedCrop(size=256, scale=(0.5, 1.0)),  # Randomly crop image
-                # transforms.RandomAdjustSharpness(sharpness_factor=0.2, p=0.5), # Randomly change sharpness
-                self.base_transforms # This implicitly applies ToTensor and Normalize
-            ])
-
-            # Validation / testing transforms (does not include randomization)
-            val_transform = self.base_transforms
         
         if self.is_train:
-            image_tensor = train_transform(image)
+            image_tensor = self.train_transform(image)
         else:
-            image_tensor = val_transform(image)
+            image_tensor = self.val_transform(image)
 
         return image_tensor, 1 if image_metadata_record['Ground Truth'] == 'Fake' else 0
