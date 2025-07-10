@@ -4,6 +4,7 @@ Deepfake-Eval-2024
 *.amlignore
 .ipynb_aml_checkpoints/
 .ipynb_checkpoints/
+*.pkl
 
 # MacOS
 .DS_Store

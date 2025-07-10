@@ -5,8 +5,7 @@ from torch.utils.data import Dataset
 import pandas as pd
 from PIL import Image
 import torchvision.transforms as transforms
-from torchvision.models import ResNet50_Weights, ViT_B_32_Weights
-from transformers import AutoImageProcessor
+from torchvision.models import ResNet50_Weights, ViT_B_32_Weights, ConvNeXt_Base_Weights
 
 import random
 import numpy as np
@@ -32,7 +31,7 @@ class DeepFakeDataset(Dataset):
                 file path for metadata csv
             image_dir_path: str
                 path for directory contain images
-            model_type: {'ResNet', 'ViT', 'CvT'}
+            model_type: {'ResNet', 'ViT', 'ConvNeXt'}
                 type of vison model
             is_train: bool, default = True
                 whether the dataset is to be used for training and development or testing
@@ -47,8 +46,8 @@ class DeepFakeDataset(Dataset):
             self.base_transforms = ResNet50_Weights.DEFAULT.transforms()
         elif self.model_type == 'ViT':
             self.base_transforms = ViT_B_32_Weights.DEFAULT.transforms()
-        elif self.model_type == 'CvT':
-            self.base_transforms = lambda x: AutoImageProcessor.from_pretrained("microsoft/cvt-13")(x, return_tensors = "pt")['pixel_values'].squeeze()
+        elif self.model_type == 'ConvNeXt':
+            self.base_transforms = ConvNeXt_Base_Weights.DEFAULT.transforms()
         
     def __len__(self):
         return len(self.metadata)
@@ -59,7 +58,7 @@ class DeepFakeDataset(Dataset):
         image = Image.open(image_path)
         image = image.convert("RGB")
 
-        if self.model_type not in ['ResNet', 'ViT', 'CvT']:
+        if self.model_type not in ['ResNet', 'ViT', 'ConvNeXt']:
             # Training transforms (includes randomization to augment data for each epoch)
             train_transform = transforms.Compose([
                 transforms.RandomResizedCrop(size=224, scale=(0.5, 1.0)), # Randomly crop image NOTE: size can be changed if not resnet / ViT
