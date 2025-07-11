@@ -2,7 +2,11 @@ import torch
 from torcheval.metrics.functional import binary_auroc, binary_auprc, binary_accuracy
 from torch.nn.functional import softmax
 
-def train_epoch(dataloader, model, loss_fn, optimizer,  device, print_progress = True):
+def print_(message, log = True):
+    if log:
+        print(message)
+
+def train_epoch(dataloader, model, loss_fn, optimizer,  device, verbose = True):
     """
     Iterate through all training samples once, update weights, and evaluate performance on training data
     
@@ -47,19 +51,18 @@ def train_epoch(dataloader, model, loss_fn, optimizer,  device, print_progress =
         optimizer.zero_grad()
 
         current = batch * dataloader.batch_size + len(X)
-        if print_progress:
-            print(f"Training Progress: \t[{current:>5d}/{len(dataloader.dataset):>5d}]")
+        print_(f"\tTraining Progress: \t[{current:>5d}/{len(dataloader.dataset):>5d}]", verbose)
 
-    return validate_epoch(dataloader, model, loss_fn, device)
+    return validate_epoch(dataloader, model, loss_fn, device, verbose)
 
-def validate_epoch(dataloader, model, loss_fn, device, print_progress = True):
+def validate_epoch(dataloader, model, loss_fn, device, verbose = True):
     """
     Evaluate performance on passed data
     
     Parameters
     ----------
         dataloader: torch.utils.data.dataloader.DataLoader
-            Data to learn from
+            Data to evaluate performance on
         model: torchvision.models
             Torch vision model to be updated (should be binary classifier)
         loss_fn: torch.nn.modules.loss
@@ -104,8 +107,7 @@ def validate_epoch(dataloader, model, loss_fn, device, print_progress = True):
             all_labels = torch.cat((all_labels, y), dim = 0)
         
             current = batch * dataloader.batch_size + len(X)
-            if print_progress:
-                print(f"Evaluation Progress: \t[{current:>5d}/{len(dataloader.dataset):>5d}]")
+            print_(f"\tEvaluation Progress: \t[{current:>5d}/{len(dataloader.dataset):>5d}]", verbose)
 
     # compute metrics over all samples
     val_auroc = binary_auroc(all_pred_prob[:,1], all_labels)
@@ -114,3 +116,53 @@ def validate_epoch(dataloader, model, loss_fn, device, print_progress = True):
     val_loss /= len(dataloader.dataset)
 
     return val_loss, val_auroc.item(), val_auprc.item(), val_acc.item()
+
+def train(num_epochs, train_data_loader, val_data_loader, model, loss_fn, optimizer, device, verbose = True):
+    """
+    Train on data for a specified number of epochs
+    
+    Parameters
+    ----------
+        num_epochs: int
+            Number of complete passes through training data
+        train_data_loader: torch.utils.data.dataloader.DataLoader
+            Data to learn from
+        val_data_loader: torch.utils.data.dataloader.DataLoader
+            Data to evaluate performance on
+        model: torchvision.models
+            Torch vision model to be updated (should be binary classifier)
+        loss_fn: torch.nn.modules.loss
+            Loss function to be evaluated and used to update weights (2nd-order optimizers such as LBGFS or Conjugate Gradient are not supported)
+        optimizer: torch.optim
+            Optimization algorithm for learning weights
+        device: {torch.device("cuda"), torch.device("cpu")}
+            Whether data is to be pushed to GPU or CPU
+    
+    Returns
+    ----------
+        train_loss: list(float)
+        train_auroc: list(float)
+        train_auroc: list(float)
+        train_acc: list(float)
+        val_loss: list(float)
+        val_auroc: list(float)
+        val_auroc: list(float)
+        val_acc: list(float)
+            Performance metrics logged at each epoch of training
+    """
+    # setup to training history
+    train_loss_, train_auroc_, train_auprc_, train_acc_, val_loss_, val_auroc_, val_auprc_, val_acc_ = [None] * num_epochs, [None] * num_epochs, [None] * num_epochs, [None] * num_epochs, [None] * num_epochs, [None] * num_epochs, [None] * num_epochs, [None] * num_epochs
+    for t in range(num_epochs):
+        print_(f"Epoch {t+1}\n- - - - - - - - - - - - - - - - - - - - - - - - - ", verbose)
+        
+        print_("Training...", verbose)
+        train_loss, train_auroc, train_auprc, train_acc = train_epoch(train_data_loader, model, loss_fn, optimizer, device)
+
+        print_("Validating...", verbose)
+        val_loss, val_auroc, val_auprc, val_acc = validate_epoch(val_data_loader, model, loss_fn, device)
+        
+        print_(f"Training Error: \n\tLoss: {train_loss:>8f}\tROC AUC: {train_auroc:>4f}\tPR AUC: {train_auprc:>4f}\tAccuracy: {train_acc:>4f}", verbose)
+        print_(f"Validation Error: \n\tLoss: {val_loss:>8f}\tROC AUC: {val_auroc:>4f}\tPR AUC: {val_auprc:>4f}\tAccuracy: {val_acc:>4f}", verbose)
+        train_loss_[t], train_auroc_[t], train_auprc_[t], train_acc_[t], val_loss_[t], val_auroc_[t], val_auprc_[t], val_acc_[t] = train_loss, train_auroc, train_auprc, train_acc, val_loss, val_auroc, val_auprc, val_acc
+        print_("", verbose)
+    return train_loss_, train_auroc_, train_auprc_, train_acc_, val_loss_, val_auroc_, val_auprc_, val_acc_

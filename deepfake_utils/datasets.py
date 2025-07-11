@@ -17,7 +17,7 @@ torch.manual_seed(SEED)
 if torch.cuda.is_available():
     torch.cuda.manual_seed(SEED)
     torch.cuda.manual_seed_all(SEED)
-if torch.mps.is_available():
+if hasattr(torch.mps, "is_available") and torch.mps.is_available():
     torch.mps.manual_seed(SEED) 
 
 class DeepFakeDataset(Dataset):
