@@ -1,5 +1,5 @@
 import torch
-from torcheval.metrics.functional import binary_auroc, binary_auprc
+from torcheval.metrics.functional import binary_auroc, binary_auprc, binary_accuracy
 
 def train_epoch(dataloader, model, loss_fn, optimizer,  device, print_progress = True):
     """
@@ -103,6 +103,7 @@ def validate_epoch(dataloader, model, loss_fn, device, print_progress = True):
     # compute metrics over all samples
     val_auroc = binary_auroc(all_preds[:,1], all_labels)
     val_auprc = binary_auprc(all_preds[:,1], all_labels)
+    val_acc = binary_accuracy(all_preds[:,1], all_labels, threshold = 0.5)
     val_loss /= len(dataloader.dataset)
 
-    return val_loss, val_auroc.item(), val_auprc.item()
+    return val_loss, val_auroc.item(), val_auprc.item(), val_acc.item()
