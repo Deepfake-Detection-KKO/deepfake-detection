@@ -120,7 +120,7 @@ def validate_epoch(dataloader, model, loss_fn, device, verbose = True):
 
         return val_loss, val_auroc.item(), val_auprc.item(), val_acc.item()
 
-def train(num_epochs, train_data_loader, val_data_loader, model, loss_fn, optimizer, device, verbose = True):
+def train(num_epochs, train_data_loader, val_data_loader, model, loss_fn, optimizer, device, verbose = True, lr_scheduler=None):
     """
     Train on data for a specified number of epochs
     
@@ -181,6 +181,10 @@ def train(num_epochs, train_data_loader, val_data_loader, model, loss_fn, optimi
             train_loss_[t], train_auroc_[t], train_auprc_[t], train_acc_[t], val_loss_[t], val_auroc_[t], val_auprc_[t], val_acc_[t] = train_loss, train_auroc, train_auprc, train_acc, val_loss, val_auroc, val_auprc, val_acc
             print_("", verbose)
 
+        # Apply learning rate schedule if provided
+        if lr_scheduler:
+            lr_scheduler.step()
+        
     if device.type == 'mps':
         return train_loss_, train_acc_, val_loss_, val_acc_
     else:    
