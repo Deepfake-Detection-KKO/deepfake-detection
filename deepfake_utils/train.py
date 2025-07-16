@@ -110,12 +110,15 @@ def validate_epoch(dataloader, model, loss_fn, device, verbose = True):
             print_(f"\tEvaluation Progress: \t[{current:>5d}/{len(dataloader.dataset):>5d}]", verbose)
 
     # compute metrics over all samples
-    val_auroc = binary_auroc(all_pred_prob[:,1], all_labels)
-    val_auprc = binary_auprc(all_pred_prob[:,1], all_labels)
     val_acc = binary_accuracy(all_pred_prob[:,1], all_labels, threshold = 0.5)
     val_loss /= len(dataloader.dataset)
+    if device.type == 'mps': # MacOS MPS doesn't support binary_auroc, binary_auprc because it converts to float64
+        return val_loss, val_acc.item()
+    else:
+        val_auroc = binary_auroc(all_pred_prob[:,1], all_labels)
+        val_auprc = binary_auprc(all_pred_prob[:,1], all_labels)
 
-    return val_loss, val_auroc.item(), val_auprc.item(), val_acc.item()
+        return val_loss, val_auroc.item(), val_auprc.item(), val_acc.item()
 
 def train(num_epochs, train_data_loader, val_data_loader, model, loss_fn, optimizer, device, verbose = True):
     """
@@ -155,14 +158,30 @@ def train(num_epochs, train_data_loader, val_data_loader, model, loss_fn, optimi
     for t in range(num_epochs):
         print_(f"Epoch {t+1}\n- - - - - - - - - - - - - - - - - - - - - - - - - ", verbose)
         
-        print_("Training...", verbose)
-        train_loss, train_auroc, train_auprc, train_acc = train_epoch(train_data_loader, model, loss_fn, optimizer, device)
+        if device.type == 'mps':
+            print_("Training...", verbose)
+            train_loss, train_acc = train_epoch(train_data_loader, model, loss_fn, optimizer, device)
 
-        print_("Validating...", verbose)
-        val_loss, val_auroc, val_auprc, val_acc = validate_epoch(val_data_loader, model, loss_fn, device)
-        
-        print_(f"Training Error: \n\tLoss: {train_loss:>8f}\tROC AUC: {train_auroc:>4f}\tPR AUC: {train_auprc:>4f}\tAccuracy: {train_acc:>4f}", verbose)
-        print_(f"Validation Error: \n\tLoss: {val_loss:>8f}\tROC AUC: {val_auroc:>4f}\tPR AUC: {val_auprc:>4f}\tAccuracy: {val_acc:>4f}", verbose)
-        train_loss_[t], train_auroc_[t], train_auprc_[t], train_acc_[t], val_loss_[t], val_auroc_[t], val_auprc_[t], val_acc_[t] = train_loss, train_auroc, train_auprc, train_acc, val_loss, val_auroc, val_auprc, val_acc
-        print_("", verbose)
-    return train_loss_, train_auroc_, train_auprc_, train_acc_, val_loss_, val_auroc_, val_auprc_, val_acc_
+            print_("Validating...", verbose)
+            val_loss, val_acc = validate_epoch(val_data_loader, model, loss_fn, device)
+
+            print_(f"Training Error: \n\tLoss: {train_loss:>8f}\tAccuracy: {train_acc:>4f}", verbose)
+            print_(f"Validation Error: \n\tLoss: {val_loss:>8f}\tAccuracy: {val_acc:>4f}", verbose)
+            train_loss_[t], train_acc_[t], val_loss_[t], val_acc_[t] = train_loss, train_acc, val_loss, val_acc
+            print_("", verbose)
+        else:
+            print_("Training...", verbose)
+            train_loss, train_auroc, train_auprc, train_acc = train_epoch(train_data_loader, model, loss_fn, optimizer, device)
+
+            print_("Validating...", verbose)
+            val_loss, val_auroc, val_auprc, val_acc = validate_epoch(val_data_loader, model, loss_fn, device)
+
+            print_(f"Training Error: \n\tLoss: {train_loss:>8f}\tROC AUC: {train_auroc:>4f}\tPR AUC: {train_auprc:>4f}\tAccuracy: {train_acc:>4f}", verbose)
+            print_(f"Validation Error: \n\tLoss: {val_loss:>8f}\tROC AUC: {val_auroc:>4f}\tPR AUC: {val_auprc:>4f}\tAccuracy: {val_acc:>4f}", verbose)
+            train_loss_[t], train_auroc_[t], train_auprc_[t], train_acc_[t], val_loss_[t], val_auroc_[t], val_auprc_[t], val_acc_[t] = train_loss, train_auroc, train_auprc, train_acc, val_loss, val_auroc, val_auprc, val_acc
+            print_("", verbose)
+
+    if device.type == 'mps':
+        return train_loss_, train_acc_, val_loss_, val_acc_
+    else:    
+        return train_loss_, train_auroc_, train_auprc_, train_acc_, val_loss_, val_auroc_, val_auprc_, val_acc_
