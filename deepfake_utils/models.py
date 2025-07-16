@@ -3,7 +3,7 @@ import torch.nn as nn
 from torchvision.models import resnet50, ResNet50_Weights, vit_b_32, ViT_B_32_Weights
 
 class MyModel(nn.Module):
-    def __init__(self, model_type, device, num_classes=2, dropout_rate=0):
+    def __init__(self, model_type, device, num_classes=2, dropout_rate=0, freeze_layers=True):
         """Initializes the MyModel class.
 
         If the model is pretrained, its parameters are frozen, and 
@@ -37,7 +37,7 @@ class MyModel(nn.Module):
 
             # Freeze parameters within ResNet
             for param in self.model.parameters():
-                param.requires_grad = False
+                param.requires_grad = not(freeze_layers)
 
             # Replace last fully connected layer
             num_ftrs = self.model.fc.in_features
@@ -53,7 +53,7 @@ class MyModel(nn.Module):
 
             # Freeze parameters within Vision Transformer
             for param in self.model.parameters():
-                param.requires_grad = False
+                param.requires_grad = not(freeze_layers)
 
             # Replace last fully connected layer
             num_ftrs = self.model.heads.head.in_features
