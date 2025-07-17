@@ -14,7 +14,10 @@ import time
 
 # Constants
 BATCH_SIZE = 64
-NUM_WORKERS = 4
+NUM_WORKERS = 8
+
+# Enable TensorFloat32 for better performance on compatible GPUs
+torch.set_float32_matmul_precision('high')
 
 # Set random seed
 SEED = 8
@@ -65,12 +68,7 @@ for model_type in model_types:
             for learning_rate in learning_rates:
                 start_time = time.time()
 
-                # Create model
-                model = MyModel(
-                    model_type=model_type,
-                    device=device,
-                    dropout_rate=dropout_rate
-                )
+                                model = torch.compile(model)
 
                 # Optimizer and learning rate schedule
                 optimizer = torch.optim.Adam(model.parameters(), lr = learning_rate)
