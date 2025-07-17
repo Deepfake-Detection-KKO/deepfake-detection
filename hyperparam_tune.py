@@ -61,16 +61,16 @@ for model_type in model_types:
     val_data_loader = DataLoader(val_data, batch_size = BATCH_SIZE, shuffle = False, num_workers=NUM_WORKERS)
     
     for dropout_rate in dropout_rates:
-        # Create model
-        model = MyModel(
-            model_type=model_type,
-            device=device,
-            dropout_rate=dropout_rate
-        )
-
         for epochs in epochs_list:
             for learning_rate in learning_rates:
                 start_time = time.time()
+
+                # Create model
+                model = MyModel(
+                    model_type=model_type,
+                    device=device,
+                    dropout_rate=dropout_rate
+                )
 
                 # Optimizer and learning rate schedule
                 optimizer = torch.optim.Adam(model.parameters(), lr = learning_rate)
