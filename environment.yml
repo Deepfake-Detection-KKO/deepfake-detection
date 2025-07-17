@@ -1,4 +1,4 @@
-name: /home/hice1/ktang86/scratch/cs7643
+name: cs7643
 channels:
   - anaconda
   - defaults
@@ -238,4 +238,4 @@ dependencies:
       - torcheval==0.0.7
       - torchvision==0.22.1
       - triton==3.3.1
-prefix: /home/hice1/ktang86/scratch/cs7643
+prefix: /home/hice1/$USER/scratch/cs7643
