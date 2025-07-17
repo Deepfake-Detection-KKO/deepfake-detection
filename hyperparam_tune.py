@@ -38,7 +38,7 @@ device = torch.accelerator.current_accelerator()
 print(f'Using {device} accelerator \n')
 
 # Save Model Weights?
-save_model_weights = False
+save_model_weights = True
 
 # Loss function
 loss_fn = nn.CrossEntropyLoss(reduction = 'sum')
@@ -147,9 +147,10 @@ for model_type in model_types:
                                 output_filename = "experiment_results.csv"
                                 pd.DataFrame(experiment_record).to_csv(output_filename, mode = 'a', header = os.path.exists(output_filename) == False, index = False)
 
-                                experiment_id += 1
                                 end_time = time.time()
                                 print("Time taken:", (end_time - start_time)/60)
                                 print()
                                 if save_model_weights:
                                     torch.save(model.state_dict(), f"experiment_{experiment_id}.pth")
+                                    
+                                experiment_id += 1
