@@ -73,7 +73,7 @@ class MyModel(nn.Module):
 
             # Modify classifier head
             num_ftrs = self.model.classifier[2].in_features
-            self.model.heads = nn.Sequential(
+            self.model.classifier = nn.Sequential(
                 self.model.classifier[0], # LayerNorm2d
                 self.model.classifier[1], # flatten
                 nn.Dropout(self.dropout_rate),
