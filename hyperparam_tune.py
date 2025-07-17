@@ -41,14 +41,14 @@ print(f'Using {device} accelerator \n')
 loss_fn = nn.CrossEntropyLoss(reduction = 'sum')
 
 # Hyperparameters TODO update
-model_types = ['ViT-b32-pretrained', 'ResNet-50-pretrained']
-freeze_layers = [True]
-dropout_rates = [0.2]
-l2_penalties = [0.0001]
-optimizer_classes = [torch.optim.Adam, torch.optim.SGD]
-learning_rates = [1e-3]
-epochs_list = [10]
-lr_scheduler_types = ['CosineAnnealingWarmRestarts', 'StepLR']
+model_types = ['ConvNeXt-base-pretrained', 'ViT-b32-pretrained', 'ResNet-50-pretrained']
+freeze_layers = [False, True]
+dropout_rates = [0, 0.2, 0.5]
+l2_penalties = [0, 0.0001, 0.001]
+optimizer_classes = [torch.optim.Adam]
+learning_rates = [1e-3, 1e-4]
+epochs_list = [20]
+lr_scheduler_types = ['StepLR', 'CosineAnnealingWarmRestarts']
 
 experiment_id = 1
 
@@ -58,6 +58,8 @@ for model_type in model_types:
         transform_type = 'ViT'
     elif "ResNet" in model_type:
         transform_type = 'ResNet'
+    elif "ConvNeXt" in model_type:
+        transform_type  = 'ConvNeXt'
     
     # Load data
     train_data = DeepFakeDataset("image-metadata-train.csv", IMAGE_DIR_PATH, transform_type, is_train = True)
@@ -146,3 +148,4 @@ for model_type in model_types:
                                 end_time = time.time()
                                 print("Time taken:", (end_time - start_time)/60)
                                 print()
+                                torch.save(model.state_dict(), f"experiment_{experiment_id}.pth")
