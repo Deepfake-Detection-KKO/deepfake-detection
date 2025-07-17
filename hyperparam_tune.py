@@ -31,7 +31,7 @@ if torch.mps.is_available():
     torch.mps.manual_seed(SEED)
 
 # Paths
-IMAGE_DIR_PATH = 'Deepfake-Eval-2024/image-data'
+IMAGE_DIR_PATH = 'Deepfake-Eval-2024/image-data-rescaled'
 
 # Device
 device = torch.accelerator.current_accelerator()
