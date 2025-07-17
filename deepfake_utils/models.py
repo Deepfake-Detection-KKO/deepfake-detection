@@ -1,6 +1,6 @@
 
 import torch.nn as nn
-from torchvision.models import resnet50, ResNet50_Weights, vit_b_32, ViT_B_32_Weights
+from torchvision.models import resnet50, ResNet50_Weights, vit_b_32, ViT_B_32_Weights, convnext_base, ConvNeXt_Base_Weights
 
 class MyModel(nn.Module):
     def __init__(self, model_type, device, num_classes=2, dropout_rate=0, freeze_layers=True):
@@ -58,6 +58,24 @@ class MyModel(nn.Module):
             # Replace last fully connected layer
             num_ftrs = self.model.heads.head.in_features
             self.model.heads = nn.Sequential(
+                nn.Dropout(self.dropout_rate),
+                nn.Linear(num_ftrs, self.num_classes)
+            )
+
+        elif self.model_type == "ConvNeXt-base-pretrained":
+            # Set the weights
+            self.weights = ConvNeXt_Base_Weights.DEFAULT
+            self.model = convnext_base(weights=self.weights)
+
+            # Freeze parameters within Vision Transformer
+            for param in self.model.parameters():
+                param.requires_grad = not(freeze_layers)
+
+            # Modify classifier head
+            num_ftrs = self.model.classifier[2].in_features
+            self.model.classifier = nn.Sequential(
+                self.model.classifier[0], # LayerNorm2d
+                self.model.classifier[1], # flatten
                 nn.Dropout(self.dropout_rate),
                 nn.Linear(num_ftrs, self.num_classes)
             )

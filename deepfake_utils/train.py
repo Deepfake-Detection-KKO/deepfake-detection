@@ -1,12 +1,12 @@
 import torch
-from torcheval.metrics.functional import binary_auroc, binary_auprc, binary_accuracy
+from torcheval.metrics import BinaryAUROC, BinaryAUPRC, BinaryAccuracy
 from torch.nn.functional import softmax
 
 def print_(message, log = True):
     if log:
         print(message)
 
-def train_epoch(dataloader, model, loss_fn, optimizer,  device, verbose = True):
+def train_epoch(dataloader, model, loss_fn, optimizer,  device, verbose = True, recalc_train_metrics=False, log_interval=10):
     """
     Iterate through all training samples once, update weights, and evaluate performance on training data
     
@@ -36,6 +36,13 @@ def train_epoch(dataloader, model, loss_fn, optimizer,  device, verbose = True):
     """
     # learn the weights
     model.train()
+
+    # Initialize metrics
+    train_loss = 0
+    acc_metric = BinaryAccuracy(device=device)
+    auroc_metric = BinaryAUROC(device=device)
+    auprc_metric = BinaryAUPRC(device=device)
+
     for batch, (X, y) in enumerate(dataloader):
         # move data to GPU
         X = X.to(device)
@@ -50,12 +57,29 @@ def train_epoch(dataloader, model, loss_fn, optimizer,  device, verbose = True):
         optimizer.step()
         optimizer.zero_grad()
 
-        current = batch * dataloader.batch_size + len(X)
-        print_(f"\tTraining Progress: \t[{current:>5d}/{len(dataloader.dataset):>5d}]", verbose)
+        # Accumulate metrics
+        train_loss += loss.item()
+        pred_prob = softmax(pred, dim=1)
+        acc_metric.update(pred_prob[:, 1], y)
+        auroc_metric.update(pred_prob[:, 1], y)
+        auprc_metric.update(pred_prob[:, 1], y)
 
-    return validate_epoch(dataloader, model, loss_fn, device, verbose)
+        # Reduce logging
+        if (batch + 1) % log_interval == 0 or (batch + 1) == len(dataloader):
+            current = (batch + 1) * dataloader.batch_size
+            print_(f"\tTraining Progress: \t[{current:>5d}/{len(dataloader.dataset):>5d}]", verbose)
 
-def validate_epoch(dataloader, model, loss_fn, device, verbose = True):
+    if recalc_train_metrics:
+        return validate_epoch(dataloader, model, loss_fn, device, verbose)
+    else:
+        # compute metrics over all samples
+        train_loss /= len(dataloader.dataset)
+        train_acc = acc_metric.compute()
+        train_auroc = auroc_metric.compute()
+        train_auprc = auprc_metric.compute()
+        return train_loss, train_auroc.item(), train_auprc.item(), train_acc.item()
+
+def validate_epoch(dataloader, model, loss_fn, device, verbose = True, log_interval=5):
     """
     Evaluate performance on passed data
     
@@ -85,8 +109,9 @@ def validate_epoch(dataloader, model, loss_fn, device, verbose = True):
 
     # initialize variables to compute metrics over entire dataset
     val_loss = 0
-    all_pred_prob = torch.zeros((0,2)).to(device)
-    all_labels = torch.zeros(0).to(device)
+    acc_metric = BinaryAccuracy(device=device)
+    auroc_metric = BinaryAUROC(device=device)
+    auprc_metric = BinaryAUPRC(device=device)
 
     # to compute metrics properly, switch reduction method to 'sum' if not already
     loss_fn.reduction = 'sum'
@@ -103,24 +128,27 @@ def validate_epoch(dataloader, model, loss_fn, device, verbose = True):
             
             # append batch predictions and labels
             pred_prob = softmax(pred, dim = 1)
-            all_pred_prob = torch.cat((all_pred_prob, pred_prob), dim = 0)
-            all_labels = torch.cat((all_labels, y), dim = 0)
+            acc_metric.update(pred_prob[:, 1], y)
+            auroc_metric.update(pred_prob[:, 1], y)
+            auprc_metric.update(pred_prob[:, 1], y)
         
-            current = batch * dataloader.batch_size + len(X)
-            print_(f"\tEvaluation Progress: \t[{current:>5d}/{len(dataloader.dataset):>5d}]", verbose)
+            # Reduce logging
+            if (batch + 1) % log_interval == 0 or (batch + 1) == len(dataloader):
+                current = (batch + 1) * dataloader.batch_size
+                print_(f"\tEvaluation Progress: \t[{current:>5d}/{len(dataloader.dataset):>5d}]", verbose)
 
     # compute metrics over all samples
-    val_acc = binary_accuracy(all_pred_prob[:,1], all_labels, threshold = 0.5)
     val_loss /= len(dataloader.dataset)
+    val_acc = acc_metric.compute()
     if device.type == 'mps': # MacOS MPS doesn't support binary_auroc, binary_auprc because it converts to float64
         return val_loss, val_acc.item()
     else:
-        val_auroc = binary_auroc(all_pred_prob[:,1], all_labels)
-        val_auprc = binary_auprc(all_pred_prob[:,1], all_labels)
+        val_auroc = auroc_metric.compute()
+        val_auprc = auprc_metric.compute()
 
         return val_loss, val_auroc.item(), val_auprc.item(), val_acc.item()
 
-def train(num_epochs, train_data_loader, val_data_loader, model, loss_fn, optimizer, device, verbose = True, lr_scheduler=None):
+def train(num_epochs, train_data_loader, val_data_loader, model, loss_fn, optimizer, device, verbose = True, lr_scheduler=None, recalc_train_metrics=False, log_interval=10):
     """
     Train on data for a specified number of epochs
     
@@ -160,10 +188,10 @@ def train(num_epochs, train_data_loader, val_data_loader, model, loss_fn, optimi
         
         if device.type == 'mps':
             print_("Training...", verbose)
-            train_loss, train_acc = train_epoch(train_data_loader, model, loss_fn, optimizer, device)
+            train_loss, train_acc = train_epoch(train_data_loader, model, loss_fn, optimizer, device, recalc_train_metrics=False, log_interval=log_interval)
 
             print_("Validating...", verbose)
-            val_loss, val_acc = validate_epoch(val_data_loader, model, loss_fn, device)
+            val_loss, val_acc = validate_epoch(val_data_loader, model, loss_fn, device, log_interval=log_interval/2)
 
             print_(f"Training Error: \n\tLoss: {train_loss:>8f}\tAccuracy: {train_acc:>4f}", verbose)
             print_(f"Validation Error: \n\tLoss: {val_loss:>8f}\tAccuracy: {val_acc:>4f}", verbose)
@@ -171,10 +199,10 @@ def train(num_epochs, train_data_loader, val_data_loader, model, loss_fn, optimi
             print_("", verbose)
         else:
             print_("Training...", verbose)
-            train_loss, train_auroc, train_auprc, train_acc = train_epoch(train_data_loader, model, loss_fn, optimizer, device)
+            train_loss, train_auroc, train_auprc, train_acc = train_epoch(train_data_loader, model, loss_fn, optimizer, device, recalc_train_metrics=False, log_interval=log_interval)
 
             print_("Validating...", verbose)
-            val_loss, val_auroc, val_auprc, val_acc = validate_epoch(val_data_loader, model, loss_fn, device)
+            val_loss, val_auroc, val_auprc, val_acc = validate_epoch(val_data_loader, model, loss_fn, device, log_interval=log_interval/2)
 
             print_(f"Training Error: \n\tLoss: {train_loss:>8f}\tROC AUC: {train_auroc:>4f}\tPR AUC: {train_auprc:>4f}\tAccuracy: {train_acc:>4f}", verbose)
             print_(f"Validation Error: \n\tLoss: {val_loss:>8f}\tROC AUC: {val_auroc:>4f}\tPR AUC: {val_auprc:>4f}\tAccuracy: {val_acc:>4f}", verbose)
