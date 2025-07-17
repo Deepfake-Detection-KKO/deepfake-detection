@@ -41,12 +41,12 @@ print(f'Using {device} accelerator \n')
 loss_fn = nn.CrossEntropyLoss(reduction = 'sum')
 
 # Hyperparameters TODO update
-model_types = ['ViT-b32-pretrained']
+model_types = ['ViT-b32-pretrained', 'ResNet-50-pretrained']
 freeze_layers = [True]
 dropout_rates = [0.2]
-l2_penalties = [0]
+l2_penalties = [0.0001]
 optimizer_classes = [torch.optim.Adam, torch.optim.SGD]
-learning_rates = [1e-3, 1e-4]
+learning_rates = [1e-3]
 epochs_list = [10]
 lr_scheduler_types = ['CosineAnnealingWarmRestarts', 'StepLR']
 
