@@ -21,7 +21,7 @@ if hasattr(torch.mps, "is_available") and torch.mps.is_available():
     torch.mps.manual_seed(SEED) 
 
 class DeepFakeDataset(Dataset):
-    def __init__(self, metadata_path: str, image_dir_path: str, model_type: str, is_train: bool = True):
+    def __init__(self, metadata_path: str, image_dir_path: str, model_type: str, is_train: bool = True, return_filename = False):
         """
         Dataset subclass which preprocesses deepfakes
         
@@ -40,6 +40,7 @@ class DeepFakeDataset(Dataset):
         self.image_dir_path = image_dir_path
         self.model_type = model_type
         self.is_train = is_train
+        self.return_filename = return_filename
 
         # load image preprocessors for pretrained models
         if self.model_type == 'ResNet':
@@ -88,4 +89,7 @@ class DeepFakeDataset(Dataset):
         else:
             image_tensor = self.val_transform(image)
 
-        return image_tensor, 1 if image_metadata_record['Ground Truth'] == 'Fake' else 0
+        if self.return_filename:
+            return image_tensor, 1 if image_metadata_record['Ground Truth'] == 'Fake' else 0, image_metadata_record['Filename']
+        else:
+            return image_tensor, 1 if image_metadata_record['Ground Truth'] == 'Fake' else 0
