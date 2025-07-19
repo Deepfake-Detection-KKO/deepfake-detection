@@ -8,6 +8,7 @@ Deepfake-Eval-2024*
 *.pth
 *.pt
 *.csv
+*.zip
 
 # MacOS
 .DS_Store
