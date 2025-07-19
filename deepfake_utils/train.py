@@ -1,6 +1,7 @@
 import torch
 from torcheval.metrics import BinaryAUROC, BinaryAUPRC, BinaryAccuracy
 from torch.nn.functional import softmax
+from .earlystop import EarlyStopping
 
 def print_(message, log = True):
     if log:
@@ -183,6 +184,10 @@ def train(num_epochs, train_data_loader, val_data_loader, model, loss_fn, optimi
     """
     # setup to training history
     train_loss_, train_auroc_, train_auprc_, train_acc_, val_loss_, val_auroc_, val_auprc_, val_acc_ = [None] * num_epochs, [None] * num_epochs, [None] * num_epochs, [None] * num_epochs, [None] * num_epochs, [None] * num_epochs, [None] * num_epochs, [None] * num_epochs
+    # Initialize early stopping criteria
+    early_stopping = EarlyStopping(patience=5, delta=0.001)
+
+    # Start iterating over epochs
     for t in range(num_epochs):
         print_(f"Epoch {t+1}\n- - - - - - - - - - - - - - - - - - - - - - - - - ", verbose)
         
@@ -209,9 +214,18 @@ def train(num_epochs, train_data_loader, val_data_loader, model, loss_fn, optimi
             train_loss_[t], train_auroc_[t], train_auprc_[t], train_acc_[t], val_loss_[t], val_auroc_[t], val_auprc_[t], val_acc_[t] = train_loss, train_auroc, train_auprc, train_acc, val_loss, val_auroc, val_auprc, val_acc
             print_("", verbose)
 
+        # Check early stopping criteria
+        early_stopping(val_loss, model)
+        if early_stopping.early_stop:
+            print("Early stopping")
+            break
+
         # Apply learning rate schedule if provided
         if lr_scheduler:
             lr_scheduler.step()
+    
+    # Load weights with lowest validation loss
+    early_stopping.load_best_model(model)
         
     if device.type == 'mps':
         return train_loss_, train_acc_, val_loss_, val_acc_
