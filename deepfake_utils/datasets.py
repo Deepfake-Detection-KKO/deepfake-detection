@@ -21,7 +21,7 @@ if hasattr(torch.mps, "is_available") and torch.mps.is_available():
     torch.mps.manual_seed(SEED) 
 
 class DeepFakeDataset(Dataset):
-    def __init__(self, metadata_path: str, image_dir_path: str, model_type: str, is_train: bool = True, return_filename = False):
+    def __init__(self, metadata_path: str, image_dir_path: str, model_type: str, is_train: bool = True, return_metadata = False):
         """
         Dataset subclass which preprocesses deepfakes
         
@@ -37,10 +37,12 @@ class DeepFakeDataset(Dataset):
                 whether the dataset is to be used for training and development or testing
         """
         self.metadata = pd.read_csv(metadata_path)
+        self.metadata['Filename'] = self.metadata['Filename'].fillna("")
+        self.metadata['Public Comments'] = self.metadata['Public Comments'].fillna("")
         self.image_dir_path = image_dir_path
         self.model_type = model_type
         self.is_train = is_train
-        self.return_filename = return_filename
+        self.return_metadata = return_metadata
 
         # load image preprocessors for pretrained models
         if self.model_type == 'ResNet':
@@ -89,7 +91,7 @@ class DeepFakeDataset(Dataset):
         else:
             image_tensor = self.val_transform(image)
 
-        if self.return_filename:
-            return image_tensor, 1 if image_metadata_record['Ground Truth'] == 'Fake' else 0, image_metadata_record['Filename']
+        if self.return_metadata:
+            return image_tensor, 1 if image_metadata_record['Ground Truth'] == 'Fake' else 0, image_metadata_record['Filename'], image_metadata_record['Public Comments']
         else:
             return image_tensor, 1 if image_metadata_record['Ground Truth'] == 'Fake' else 0
