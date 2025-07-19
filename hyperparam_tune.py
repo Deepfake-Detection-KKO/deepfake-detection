@@ -15,6 +15,7 @@ import time
 # Constants
 BATCH_SIZE = 64
 NUM_WORKERS = 8
+OUTPUT_FILENAME = "experiment_results_scratch.csv"
 
 # Enable TensorFloat32 for better performance on compatible GPUs
 torch.set_float32_matmul_precision('high')
@@ -38,7 +39,7 @@ device = torch.accelerator.current_accelerator()
 print(f'Using {device} accelerator \n')
 
 # Save Model Weights?
-save_model_weights = True
+save_model_weights = False
 
 # Loss function
 loss_fn = nn.CrossEntropyLoss(reduction = 'sum')
@@ -102,7 +103,7 @@ for model_type in model_types:
                                     )
                                 
                                 # Train the model
-                                total_experiments = len(model_types) * len(freeze_layers) * len(dropout_rates) * len(l2_penalties) * len(optimizer_classes) * len(learning_rates) * len(epochs_list) * len(lr_scheduler_types)
+                                total_experiments = len(model_types) * len(freeze_layers) * len(dropout_rates) * len(l2_penalties) * len(optimizer_classes) * len(learning_rates) * len(epochs_list) * len(lr_scheduler_types) + experiment_id - 1
                                 optimizer_name = optimizer_class.__name__
                                 print(f'Exp {experiment_id} of {total_experiments}: Model={model_type}, Optim={optimizer_name}, LR={learning_rate}, L2={l2_penalty}, Dropout={dropout_rate}, Scheduler={lr_scheduler_type}, Freeze={freeze_layer}')
                                 train_loss_history, train_roc_auc_history, train_pr_auc_history, train_acc_history, val_loss_history, val_roc_auc_history, val_pr_auc_history, val_acc_history = train(
@@ -144,8 +145,7 @@ for model_type in model_types:
                                 }
 
                                 # record and experiment results and save to csv
-                                output_filename = "experiment_results.csv"
-                                pd.DataFrame(experiment_record).to_csv(output_filename, mode = 'a', header = os.path.exists(output_filename) == False, index = False)
+                                pd.DataFrame(experiment_record).to_csv(OUTPUT_FILENAME, mode = 'a', header = os.path.exists(OUTPUT_FILENAME) == False, index = False)
 
                                 end_time = time.time()
                                 print("Time taken:", (end_time - start_time)/60)
