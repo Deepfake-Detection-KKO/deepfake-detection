@@ -55,6 +55,7 @@ epochs_list = [40]
 lr_scheduler_types = ['StepLR', 'CosineAnnealingWarmRestarts']
 
 experiment_id = 1
+total_experiments = len(model_types) * len(freeze_layers) * len(dropout_rates) * len(l2_penalties) * len(optimizer_classes) * len(learning_rates) * len(epochs_list) * len(lr_scheduler_types) + experiment_id - 1
 
 # Iterate through hyperparameters
 for model_type in model_types:
@@ -103,7 +104,6 @@ for model_type in model_types:
                                     )
                                 
                                 # Train the model
-                                total_experiments = len(model_types) * len(freeze_layers) * len(dropout_rates) * len(l2_penalties) * len(optimizer_classes) * len(learning_rates) * len(epochs_list) * len(lr_scheduler_types) + experiment_id - 1
                                 optimizer_name = optimizer_class.__name__
                                 print(f'Exp {experiment_id} of {total_experiments}: Model={model_type}, Optim={optimizer_name}, LR={learning_rate}, L2={l2_penalty}, Dropout={dropout_rate}, Scheduler={lr_scheduler_type}, Freeze={freeze_layer}')
                                 train_loss_history, train_roc_auc_history, train_pr_auc_history, train_acc_history, val_loss_history, val_roc_auc_history, val_pr_auc_history, val_acc_history, best_epoch = train(
