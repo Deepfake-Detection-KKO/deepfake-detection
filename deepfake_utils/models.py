@@ -1,4 +1,5 @@
-
+import clip
+import open_clip
 import torch.nn as nn
 from torchvision.models import resnet50, ResNet50_Weights, vit_b_32, ViT_B_32_Weights, convnext_base, ConvNeXt_Base_Weights
 
@@ -38,6 +39,16 @@ class MyModel(nn.Module):
             # Freeze parameters within ResNet
             for param in self.model.parameters():
                 param.requires_grad = not(freeze_layers)
+
+            # Replace last fully connected layer
+            num_ftrs = self.model.fc.in_features
+            self.model.fc = nn.Sequential(
+                nn.Dropout(self.dropout_rate),
+                nn.Linear(num_ftrs, self.num_classes)
+            )
+        
+        elif self.model_type == "ResNet-50-scratch":
+            self.model = resnet50(weights=None)
 
             # Replace last fully connected layer
             num_ftrs = self.model.fc.in_features
@@ -112,9 +123,78 @@ class MyModel(nn.Module):
                 nn.Dropout(self.dropout_rate),
                 nn.Linear(num_ftrs, self.num_classes)
             )
+        
+        elif self.model_type == "ConvNeXt-base-scratch":
+            # Set the weights
+            self.model = convnext_base(weights=None)
+
+            # Modify classifier head
+            num_ftrs = self.model.classifier[2].in_features
+            self.model.classifier = nn.Sequential(
+                self.model.classifier[0], # LayerNorm2d
+                self.model.classifier[1], # flatten
+                nn.Dropout(self.dropout_rate),
+                nn.Linear(num_ftrs, self.num_classes)
+            )
+        
+        elif self.model_type == 'ResNet-50-pretrained-clip':
+            # ResNet model from OpenAI is slightly different than torchvision
+            # final pooling layer uses attention instead of average pool
+            self.model, _ = clip.load("RN50", device = self.device)
+            num_ftrs = self.model.visual.output_dim
+
+            # Freeze parameters
+            for param in self.model.parameters():
+                param.requires_grad = not(freeze_layers)
+
+            # Classification head
+            self.classifier = nn.Sequential(
+                nn.Dropout(self.dropout_rate),
+                nn.Linear(num_ftrs, self.num_classes)
+            )
+            # Ensure classifier is same weight
+            self.classifier = self.classifier.to(self.device).half()
+        
+        elif self.model_type == 'ViT-b32-pretrained-clip':
+            # ViT model from Open AI is slightly different than torchvision
+            self.model, _ = clip.load("ViT-B/32", device = self.device)
+            num_ftrs = self.model.visual.output_dim
+
+            # Freeze parameters
+            for param in self.model.parameters():
+                param.requires_grad = not(freeze_layers)
+
+            # Classification head
+            self.classifier = nn.Sequential(
+                nn.Dropout(self.dropout_rate),
+                nn.Linear(num_ftrs, self.num_classes)
+            )
+            # Ensure classifier is same weight
+            self.classifier = self.classifier.to(self.device).half()
+
+        elif self.model_type == 'ConvNeXt-base-pretrained-clip':
+            # pretrained ConvNeXt model from ML Foundations
+            self.model, _, preprocess = open_clip.create_model_and_transforms('convnext_base', pretrained='laion400m_s13b_b51k', device = self.device)
+            num_ftrs = self.model.visual.head.proj.out_features
+
+            # Freeze parameters
+            for param in self.model.parameters():
+                param.requires_grad = not(freeze_layers)
+
+            # Classification head
+            self.classifier = nn.Sequential(
+                nn.Dropout(self.dropout_rate),
+                nn.Linear(num_ftrs, self.num_classes)
+            )
+            # Ensure classifier is same weight
+            self.classifier = self.classifier.to(self.device)
 
         self.model = self.model.to(self.device)
 
     def forward(self, x):
-        outs = self.model(x)
+        if self.model_type in ['ViT-b32-pretrained-clip', 'ResNet-50-pretrained-clip', 'ConvNeXt-base-pretrained-clip']:
+            outs = self.model.encode_image(x)
+            outs = self.classifier(outs)
+        else:
+            outs = self.model(x)
         return outs
