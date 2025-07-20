@@ -32,7 +32,6 @@ class MyModel(nn.Module):
 
         # Set model parameters based on model type
         if self.model_type == "ResNet-50-pretrained":
-            print(self.model_type)
             # Initialize the Weight Transforms
             self.weights = ResNet50_Weights.DEFAULT
             self.model = resnet50(weights=self.weights)
@@ -49,7 +48,6 @@ class MyModel(nn.Module):
             )
         
         elif self.model_type == "ResNet-50-scratch":
-            print(self.model_type)
             self.model = resnet50(weights=None)
 
             # Replace last fully connected layer
@@ -60,7 +58,6 @@ class MyModel(nn.Module):
             )
         
         elif self.model_type == "ResNet-50-scratch":
-            print(self.model_type)
             self.model = resnet50(weights=None)
 
             # Replace last fully connected layer
@@ -71,7 +68,6 @@ class MyModel(nn.Module):
             )
 
         elif self.model_type == "ViT-b32-pretrained":
-            print(self.model_type)
             # Set the weights
             self.weights = ViT_B_32_Weights.DEFAULT
             self.model = vit_b_32(weights=self.weights)
@@ -88,7 +84,6 @@ class MyModel(nn.Module):
             )
         
         elif self.model_type == "ViT-b32-scratch":
-            print(self.model_type)
             self.model = vit_b_32(weights=None)
 
             # Replace last fully connected layer
@@ -99,7 +94,6 @@ class MyModel(nn.Module):
             )
 
         elif self.model_type == "ConvNeXt-base-pretrained":
-            print(self.model_type)
             # Set the weights
             self.weights = ConvNeXt_Base_Weights.DEFAULT
             self.model = convnext_base(weights=self.weights)
@@ -118,7 +112,6 @@ class MyModel(nn.Module):
             )
         
         elif self.model_type == "ConvNeXt-base-scratch":
-            print(self.model_type)
             # Set the weights
             self.model = convnext_base(weights=None)
 
@@ -132,7 +125,6 @@ class MyModel(nn.Module):
             )
         
         elif self.model_type == "ConvNeXt-base-scratch":
-            print(self.model_type)
             # Set the weights
             self.model = convnext_base(weights=None)
 
@@ -146,7 +138,6 @@ class MyModel(nn.Module):
             )
         
         elif self.model_type == 'ResNet-50-pretrained-clip':
-            print(self.model_type)
             # ResNet model from OpenAI is slightly different than torchvision
             # final pooling layer uses attention instead of average pool
             self.model, _ = clip.load("RN50", device = self.device)
@@ -165,7 +156,6 @@ class MyModel(nn.Module):
             self.classifier = self.classifier.to(self.device)
         
         elif self.model_type == 'ViT-b32-pretrained-clip':
-            print(self.model_type)
             # ViT model from Open AI is slightly different than torchvision
             self.model, _ = clip.load("ViT-B/32", device = self.device)
             num_ftrs = self.model.visual.output_dim
@@ -183,7 +173,6 @@ class MyModel(nn.Module):
             self.classifier = self.classifier.to(self.device)
 
         elif self.model_type == 'ConvNeXt-base-pretrained-clip':
-            print(self.model_type)
             # pretrained ConvNeXt model from ML Foundations
             self.model, _, preprocess = open_clip.create_model_and_transforms('convnext_base', pretrained='laion400m_s13b_b51k', device = self.device)
             num_ftrs = self.model.visual.head.proj.out_features
