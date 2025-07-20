@@ -47,10 +47,10 @@ loss_fn = nn.CrossEntropyLoss(reduction = 'sum')
 # Hyperparameters TODO update
 model_types = ['ConvNeXt-base-pretrained']
 freeze_layers = [False]
-dropout_rates = [np.arange(0.2, 0.7, 0.1)]
+dropout_rates = np.arange(0.2, 0.7, 0.1)
 l2_penalties = [0, 1e-4, 1e-3]
 optimizer_classes = [torch.optim.Adam]
-learning_rates = [np.arange(2.5e-5, 1.5e-4, 2.5e-5)]
+learning_rates = np.arange(2.5e-5, 1.5e-4, 2.5e-5)
 epochs_list = [40]
 lr_scheduler_types = ['StepLR', 'CosineAnnealingWarmRestarts']
 
