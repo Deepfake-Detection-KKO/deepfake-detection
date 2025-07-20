@@ -1,7 +1,10 @@
 import torch
 from torcheval.metrics import BinaryAUROC, BinaryAUPRC, BinaryAccuracy
 from torch.nn.functional import softmax
+from torch.amp import autocast, GradScaler
 from .earlystop import EarlyStopping
+
+scaler = GradScaler()
 
 def print_(message, log = True):
     if log:
@@ -50,13 +53,15 @@ def train_epoch(dataloader, model, loss_fn, optimizer,  device, verbose = True, 
         y = y.to(device)
 
         # forward pass
-        pred = model(X)
-        loss = loss_fn(pred, y)
-
-        # backward pass
-        loss.backward()
-        optimizer.step()
         optimizer.zero_grad()
+        with autocast(device_type = device.type, enabled = True):
+            pred = model(X)
+            loss = loss_fn(pred, y)
+        
+        # backward pass
+        scaler.scale(loss).backward()
+        scaler.step(optimizer)
+        scaler.update()
 
         # Accumulate metrics
         train_loss += loss.item()
@@ -118,25 +123,26 @@ def validate_epoch(dataloader, model, loss_fn, device, verbose = True, log_inter
     loss_fn.reduction = 'sum'
     
     # collect predictions from all data
-    with torch.no_grad():
-        for batch, (X, y) in enumerate(dataloader):
-            # move data to GPU
-            X = X.to(device)
-            y = y.to(device)
-
-            pred = model(X)
-            val_loss += loss_fn(pred, y).item()
+    with autocast(device_type = device.type, enabled = True):
+        with torch.no_grad():
+            for batch, (X, y) in enumerate(dataloader):
+                # move data to GPU
+                X = X.to(device)
+                y = y.to(device)
+                
+                pred = model(X)
+                val_loss += loss_fn(pred, y).item()
+                
+                # append batch predictions and labels
+                pred_prob = softmax(pred, dim = 1)
+                acc_metric.update(pred_prob[:, 1], y)
+                auroc_metric.update(pred_prob[:, 1], y)
+                auprc_metric.update(pred_prob[:, 1], y)
             
-            # append batch predictions and labels
-            pred_prob = softmax(pred, dim = 1)
-            acc_metric.update(pred_prob[:, 1], y)
-            auroc_metric.update(pred_prob[:, 1], y)
-            auprc_metric.update(pred_prob[:, 1], y)
-        
-            # Reduce logging
-            if (batch + 1) % log_interval == 0 or (batch + 1) == len(dataloader):
-                current = (batch + 1) * dataloader.batch_size
-                print_(f"\tEvaluation Progress: \t[{current:>5d}/{len(dataloader.dataset):>5d}]", verbose)
+                # Reduce logging
+                if (batch + 1) % log_interval == 0 or (batch + 1) == len(dataloader):
+                    current = (batch + 1) * dataloader.batch_size
+                    print_(f"\tEvaluation Progress: \t[{current:>5d}/{len(dataloader.dataset):>5d}]", verbose)
 
     # compute metrics over all samples
     val_loss /= len(dataloader.dataset)
