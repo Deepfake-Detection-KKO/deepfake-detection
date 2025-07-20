@@ -49,19 +49,14 @@ def train_epoch(dataloader, model, loss_fn, optimizer,  device, verbose = True, 
         X = X.to(device)
         y = y.to(device)
 
-        def closure():
-            # forward pass
-            pred = model(X)
-            loss = loss_fn(pred, y)
+        # forward pass
+        pred = model(X)
+        loss = loss_fn(pred, y)
 
-            # backward pass
-            loss.backward()
-            optimizer.step()
-            optimizer.zero_grad()
-
-            return loss
-        
-        loss = optimizer.step(closure)
+        # backward pass
+        loss.backward()
+        optimizer.step()
+        optimizer.zero_grad()
 
         # Accumulate metrics
         train_loss += loss.item()
