@@ -45,6 +45,16 @@ class MyModel(nn.Module):
                 nn.Dropout(self.dropout_rate),
                 nn.Linear(num_ftrs, self.num_classes)
             )
+        
+        elif self.model_type == "ResNet-50-scratch":
+            self.model = resnet50(weights=None)
+
+            # Replace last fully connected layer
+            num_ftrs = self.model.fc.in_features
+            self.model.fc = nn.Sequential(
+                nn.Dropout(self.dropout_rate),
+                nn.Linear(num_ftrs, self.num_classes)
+            )
 
         elif self.model_type == "ViT-b32-pretrained":
             # Set the weights
@@ -61,6 +71,16 @@ class MyModel(nn.Module):
                 nn.Dropout(self.dropout_rate),
                 nn.Linear(num_ftrs, self.num_classes)
             )
+        
+        elif self.model_type == "ViT-b32-scratch":
+            self.model = vit_b_32(weights=None)
+
+            # Replace last fully connected layer
+            num_ftrs = self.model.heads.head.in_features
+            self.model.heads = nn.Sequential(
+                nn.Dropout(self.dropout_rate),
+                nn.Linear(num_ftrs, self.num_classes)
+            )
 
         elif self.model_type == "ConvNeXt-base-pretrained":
             # Set the weights
@@ -70,6 +90,19 @@ class MyModel(nn.Module):
             # Freeze parameters within Vision Transformer
             for param in self.model.parameters():
                 param.requires_grad = not(freeze_layers)
+
+            # Modify classifier head
+            num_ftrs = self.model.classifier[2].in_features
+            self.model.classifier = nn.Sequential(
+                self.model.classifier[0], # LayerNorm2d
+                self.model.classifier[1], # flatten
+                nn.Dropout(self.dropout_rate),
+                nn.Linear(num_ftrs, self.num_classes)
+            )
+        
+        elif self.model_type == "ConvNeXt-base-scratch":
+            # Set the weights
+            self.model = convnext_base(weights=None)
 
             # Modify classifier head
             num_ftrs = self.model.classifier[2].in_features
