@@ -31,3 +31,4 @@ class EarlyStopping:
     def load_best_model(self, model):
         print(f'Model weights from epoch {self.best_epoch}')
         model.load_state_dict(self.best_model_state)
+        return self.best_epoch

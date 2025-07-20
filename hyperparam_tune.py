@@ -15,7 +15,7 @@ import time
 # Constants
 BATCH_SIZE = 64
 NUM_WORKERS = 8
-OUTPUT_FILENAME = "experiment_results_scratch.csv"
+OUTPUT_FILENAME = "experiment_results_unfrozen_convnext.csv"
 
 # Enable TensorFloat32 for better performance on compatible GPUs
 torch.set_float32_matmul_precision('high')
@@ -45,13 +45,13 @@ save_model_weights = False
 loss_fn = nn.CrossEntropyLoss(reduction = 'sum')
 
 # Hyperparameters TODO update
-model_types = ['ConvNeXt-base-pretrained', 'ViT-b32-pretrained', 'ResNet-50-pretrained']
-freeze_layers = [False, True]
-dropout_rates = [0, 0.2]
-l2_penalties = [0, 0.0001]
+model_types = ['ConvNeXt-base-pretrained']
+freeze_layers = [False]
+dropout_rates = [np.arange(0.2, 0.7, 0.1)]
+l2_penalties = [0, 1e-4, 1e-3]
 optimizer_classes = [torch.optim.Adam]
-learning_rates = [1e-3]
-epochs_list = [10]
+learning_rates = [np.arange(2.5e-5, 1.5e-4, 2.5e-5)]
+epochs_list = [40]
 lr_scheduler_types = ['StepLR', 'CosineAnnealingWarmRestarts']
 
 experiment_id = 1
@@ -106,7 +106,7 @@ for model_type in model_types:
                                 total_experiments = len(model_types) * len(freeze_layers) * len(dropout_rates) * len(l2_penalties) * len(optimizer_classes) * len(learning_rates) * len(epochs_list) * len(lr_scheduler_types) + experiment_id - 1
                                 optimizer_name = optimizer_class.__name__
                                 print(f'Exp {experiment_id} of {total_experiments}: Model={model_type}, Optim={optimizer_name}, LR={learning_rate}, L2={l2_penalty}, Dropout={dropout_rate}, Scheduler={lr_scheduler_type}, Freeze={freeze_layer}')
-                                train_loss_history, train_roc_auc_history, train_pr_auc_history, train_acc_history, val_loss_history, val_roc_auc_history, val_pr_auc_history, val_acc_history = train(
+                                train_loss_history, train_roc_auc_history, train_pr_auc_history, train_acc_history, val_loss_history, val_roc_auc_history, val_pr_auc_history, val_acc_history, best_epoch = train(
                                     epochs,
                                     train_data_loader,
                                     val_data_loader,
@@ -134,14 +134,14 @@ for model_type in model_types:
                                     'val_roc_auc_history': [val_roc_auc_history], 
                                     'val_pr_auc_history': [val_pr_auc_history], 
                                     'val_acc_history': [val_acc_history],
-                                    'train_loss': [train_loss_history[-1]], 
-                                    'train_roc_auc': [train_roc_auc_history[-1]],
-                                    'train_pr_auc': [train_pr_auc_history[-1]], 
-                                    'train_acc': [train_acc_history[-1]], 
-                                    'val_loss': [val_loss_history[-1]], 
-                                    'val_roc_auc': [val_roc_auc_history[-1]], 
-                                    'val_pr_auc': [val_pr_auc_history[-1]], 
-                                    'val_acc': [val_acc_history[-1]],
+                                    'train_loss': [train_loss_history[best_epoch-1]], 
+                                    'train_roc_auc': [train_roc_auc_history[best_epoch-1]],
+                                    'train_pr_auc': [train_pr_auc_history[best_epoch-1]], 
+                                    'train_acc': [train_acc_history[best_epoch-1]], 
+                                    'val_loss': [val_loss_history[best_epoch-1]], 
+                                    'val_roc_auc': [val_roc_auc_history[best_epoch-1]], 
+                                    'val_pr_auc': [val_pr_auc_history[best_epoch-1]], 
+                                    'val_acc': [val_acc_history[best_epoch-1]],
                                 }
 
                                 # record and experiment results and save to csv

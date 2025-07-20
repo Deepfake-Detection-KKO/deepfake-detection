@@ -225,9 +225,9 @@ def train(num_epochs, train_data_loader, val_data_loader, model, loss_fn, optimi
             lr_scheduler.step()
     
     # Load weights with lowest validation loss
-    early_stopping.load_best_model(model)
+    best_epoch = early_stopping.load_best_model(model)
         
     if device.type == 'mps':
-        return train_loss_, train_acc_, val_loss_, val_acc_
+        return train_loss_, train_acc_, val_loss_, val_acc_, best_epoch
     else:    
-        return train_loss_, train_auroc_, train_auprc_, train_acc_, val_loss_, val_auroc_, val_auprc_, val_acc_
+        return train_loss_, train_auroc_, train_auprc_, train_acc_, val_loss_, val_auroc_, val_auprc_, val_acc_, best_epoch
