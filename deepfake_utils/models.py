@@ -140,8 +140,8 @@ class MyModel(nn.Module):
         elif self.model_type == 'ResNet-50-pretrained-clip':
             # ResNet model from OpenAI is slightly different than torchvision
             # final pooling layer uses attention instead of average pool
-            self.model, _ = clip.load("RN50", device = self.device)
-            num_ftrs = self.model.visual.output_dim
+            self.model, _, preprocess = open_clip.create_model_and_transforms('RN50', pretrained='cc12m', device = self.device)
+            num_ftrs = 1024
 
             # Freeze parameters
             for param in self.model.parameters():
@@ -157,8 +157,8 @@ class MyModel(nn.Module):
         
         elif self.model_type == 'ViT-b32-pretrained-clip':
             # ViT model from Open AI is slightly different than torchvision
-            self.model, _ = clip.load("ViT-B/32", device = self.device)
-            num_ftrs = self.model.visual.output_dim
+            self.model, _, preprocess = open_clip.create_model_and_transforms('ViT-B-32', pretrained='laion2b_s34b_b79k', device = self.device)
+            num_ftrs = 512
 
             # Freeze parameters
             for param in self.model.parameters():
