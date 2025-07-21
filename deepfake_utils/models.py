@@ -56,16 +56,6 @@ class MyModel(nn.Module):
                 nn.Dropout(self.dropout_rate),
                 nn.Linear(num_ftrs, self.num_classes)
             )
-        
-        elif self.model_type == "ResNet-50-scratch":
-            self.model = resnet50(weights=None)
-
-            # Replace last fully connected layer
-            num_ftrs = self.model.fc.in_features
-            self.model.fc = nn.Sequential(
-                nn.Dropout(self.dropout_rate),
-                nn.Linear(num_ftrs, self.num_classes)
-            )
 
         elif self.model_type == "ViT-b32-pretrained":
             # Set the weights
@@ -124,22 +114,8 @@ class MyModel(nn.Module):
                 nn.Linear(num_ftrs, self.num_classes)
             )
         
-        elif self.model_type == "ConvNeXt-base-scratch":
-            # Set the weights
-            self.model = convnext_base(weights=None)
-
-            # Modify classifier head
-            num_ftrs = self.model.classifier[2].in_features
-            self.model.classifier = nn.Sequential(
-                self.model.classifier[0], # LayerNorm2d
-                self.model.classifier[1], # flatten
-                nn.Dropout(self.dropout_rate),
-                nn.Linear(num_ftrs, self.num_classes)
-            )
-        
         elif self.model_type == 'ResNet-50-pretrained-clip':
-            # ResNet model from OpenAI is slightly different than torchvision
-            # final pooling layer uses attention instead of average pool
+            # load ResNet CLIP backbone from ML foundations
             self.model, _, preprocess = open_clip.create_model_and_transforms('RN50', pretrained='cc12m', device = self.device)
             num_ftrs = 1024
 
@@ -156,7 +132,7 @@ class MyModel(nn.Module):
             self.classifier = self.classifier.to(self.device)
         
         elif self.model_type == 'ViT-b32-pretrained-clip':
-            # ViT model from Open AI is slightly different than torchvision
+            # load ViT CLIP backbone from ML foundations
             self.model, _, preprocess = open_clip.create_model_and_transforms('ViT-B-32', pretrained='laion2b_s34b_b79k', device = self.device)
             num_ftrs = 512
 
@@ -173,7 +149,7 @@ class MyModel(nn.Module):
             self.classifier = self.classifier.to(self.device)
 
         elif self.model_type == 'ConvNeXt-base-pretrained-clip':
-            # pretrained ConvNeXt model from ML Foundations
+            # load ConvNeXt CLIP backbone from ML foundations
             self.model, _, preprocess = open_clip.create_model_and_transforms('convnext_base', pretrained='laion400m_s13b_b51k', device = self.device)
             num_ftrs = self.model.visual.head.proj.out_features
 
