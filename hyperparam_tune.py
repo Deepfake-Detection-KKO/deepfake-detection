@@ -15,7 +15,12 @@ import time
 # Constants
 BATCH_SIZE = 64
 NUM_WORKERS = 8
-OUTPUT_FILENAME = "experiment_results_unfrozen_convnext.csv"
+# OUTPUT_FILENAME = "experiment_results_resnet_imagenet.csv"
+OUTPUT_FILENAME = "experiment_results_resnet_clip.csv"
+# OUTPUT_FILENAME = "experiment_results_vit_imagenet.csv"
+# OUTPUT_FILENAME = "experiment_results_vit_clip.csv"
+# OUTPUT_FILENAME = "experiment_results_convnext_imagenet.csv"
+# OUTPUT_FILENAME = "experiment_results_convnext_clip.csv"
 
 # Enable TensorFloat32 for better performance on compatible GPUs
 torch.set_float32_matmul_precision('high')
@@ -45,13 +50,19 @@ save_model_weights = False
 loss_fn = nn.CrossEntropyLoss(reduction = 'sum')
 
 # Hyperparameters TODO update
-model_types = ['ConvNeXt-base-pretrained']
+# model_types = ['ResNet-50-pretrained']
+model_types = ['ResNet-50-pretrained-clip']
+# model_types = ['ViT-b32-pretrained']
+# model_types = ['ViT-b32-pretrained-clip']
+# model_types = ['ConvNeXt-base-pretrained']
+# model_types = ['ConvNeXt-base-pretrained-clip']
+# ('ResNet', 'ResNet-50-pretrained'), ('ResNet-CLIP', 'ResNet-50-pretrained-clip'), ('ViT', 'ViT-b32-pretrained'), ('ViT-CLIP', 'ViT-b32-pretrained-clip'), ('ConvNeXt', 'ConvNeXt-base-pretrained'), ('ConvNeXt-CLIP', 'ConvNeXt-base-pretrained-clip')
 freeze_layers = [False]
 dropout_rates = np.arange(0.2, 0.7, 0.1)
 l2_penalties = [0, 1e-4, 1e-3]
 optimizer_classes = [torch.optim.Adam]
-learning_rates = np.arange(2.5e-5, 1.5e-4, 2.5e-5)
-epochs_list = [40]
+learning_rates = [1e-5, 1e-4, 1e-3]
+epochs_list = [50]
 lr_scheduler_types = ['StepLR', 'CosineAnnealingWarmRestarts']
 
 experiment_id = 1
@@ -59,7 +70,13 @@ total_experiments = len(model_types) * len(freeze_layers) * len(dropout_rates) *
 
 # Iterate through hyperparameters
 for model_type in model_types:
-    if "ViT" in model_type:
+    if "ViT" in model_type and "clip" in model_type:
+        transform_type = 'ViT-CLIP'
+    elif "ResNet" in model_type and "clip" in model_type:
+        transform_type = 'ResNet-CLIP'
+    elif "ConvNeXt" in model_type and "clip" in model_type:
+        transform_type = 'ConvNeXt-CLIP'
+    elif "ViT" in model_type:
         transform_type = 'ViT'
     elif "ResNet" in model_type:
         transform_type = 'ResNet'
@@ -145,7 +162,10 @@ for model_type in model_types:
                                 }
 
                                 # record and experiment results and save to csv
-                                pd.DataFrame(experiment_record).to_csv(OUTPUT_FILENAME, mode = 'a', header = os.path.exists(OUTPUT_FILENAME) == False, index = False)
+                                if experiment_id == 1:
+                                    pd.DataFrame(experiment_record).to_csv(OUTPUT_FILENAME, index = False)
+                                else:
+                                    pd.DataFrame(experiment_record).to_csv(OUTPUT_FILENAME, mode = 'a', header = os.path.exists(OUTPUT_FILENAME) == False, index = False)
 
                                 end_time = time.time()
                                 print("Time taken:", (end_time - start_time)/60)

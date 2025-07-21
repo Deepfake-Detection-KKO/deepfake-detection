@@ -1,4 +1,6 @@
 import os
+import clip
+import open_clip
 import torch
 from torch.utils.data import Dataset
 
@@ -21,7 +23,7 @@ if hasattr(torch.mps, "is_available") and torch.mps.is_available():
     torch.mps.manual_seed(SEED) 
 
 class DeepFakeDataset(Dataset):
-    def __init__(self, metadata_path: str, image_dir_path: str, model_type: str, is_train: bool = True):
+    def __init__(self, metadata_path: str, image_dir_path: str, model_type: str, is_train: bool = True, return_metadata = False, device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")):
         """
         Dataset subclass which preprocesses deepfakes
         
@@ -37,9 +39,12 @@ class DeepFakeDataset(Dataset):
                 whether the dataset is to be used for training and development or testing
         """
         self.metadata = pd.read_csv(metadata_path)
+        self.metadata['Filename'] = self.metadata['Filename'].fillna("")
+        self.metadata['Public Comments'] = self.metadata['Public Comments'].fillna("")
         self.image_dir_path = image_dir_path
         self.model_type = model_type
         self.is_train = is_train
+        self.return_metadata = return_metadata
 
         # load image preprocessors for pretrained models
         if self.model_type == 'ResNet':
@@ -48,8 +53,14 @@ class DeepFakeDataset(Dataset):
             self.base_transforms = ViT_B_32_Weights.DEFAULT.transforms()
         elif self.model_type == 'ConvNeXt':
             self.base_transforms = ConvNeXt_Base_Weights.DEFAULT.transforms()
+        elif self.model_type == 'ResNet-CLIP':
+            _, self.base_transforms = clip.load("RN50", device)
+        elif self.model_type == 'ViT-CLIP':
+            _, self.base_transforms = clip.load("ViT-B/32", device)
+        elif self.model_type == 'ConvNeXt-CLIP':
+            _, _, self.base_transforms = open_clip.create_model_and_transforms('convnext_base', pretrained='laion400m_s13b_b51k', device = device)
 
-        if self.model_type not in ['ResNet', 'ViT', 'ConvNeXt']:
+        if self.model_type not in ['ResNet', 'ViT', 'ConvNeXt', 'ResNet-CLIP', 'ViT-CLIP', 'ConvNeXt-CLIP']:
             # Training transforms (includes randomization to augment data for each epoch)
             self.train_transform = transforms.Compose([
                 transforms.RandomResizedCrop(size=224, scale=(0.5, 1.0)), # Randomly crop image NOTE: size can be changed if not resnet / ViT
@@ -88,4 +99,7 @@ class DeepFakeDataset(Dataset):
         else:
             image_tensor = self.val_transform(image)
 
-        return image_tensor, 1 if image_metadata_record['Ground Truth'] == 'Fake' else 0
+        if self.return_metadata:
+            return image_tensor, 1 if image_metadata_record['Ground Truth'] == 'Fake' else 0, image_metadata_record['Filename'], image_metadata_record['Public Comments']
+        else:
+            return image_tensor, 1 if image_metadata_record['Ground Truth'] == 'Fake' else 0

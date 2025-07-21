@@ -1,4 +1,5 @@
-
+import clip
+import open_clip
 import torch.nn as nn
 from torchvision.models import resnet50, ResNet50_Weights, vit_b_32, ViT_B_32_Weights, convnext_base, ConvNeXt_Base_Weights
 
@@ -112,9 +113,64 @@ class MyModel(nn.Module):
                 nn.Dropout(self.dropout_rate),
                 nn.Linear(num_ftrs, self.num_classes)
             )
+        
+        elif self.model_type == 'ResNet-50-pretrained-clip':
+            # load ResNet CLIP backbone from ML foundations
+            self.model, _, preprocess = open_clip.create_model_and_transforms('RN50', pretrained='cc12m', device = self.device)
+            num_ftrs = 1024
+
+            # Freeze parameters
+            for param in self.model.parameters():
+                param.requires_grad = not(freeze_layers)
+
+            # Classification head
+            self.classifier = nn.Sequential(
+                nn.Dropout(self.dropout_rate),
+                nn.Linear(num_ftrs, self.num_classes)
+            )
+            # Ensure classifier is same weight
+            self.classifier = self.classifier.to(self.device)
+        
+        elif self.model_type == 'ViT-b32-pretrained-clip':
+            # load ViT CLIP backbone from ML foundations
+            self.model, _, preprocess = open_clip.create_model_and_transforms('ViT-B-32', pretrained='laion2b_s34b_b79k', device = self.device)
+            num_ftrs = 512
+
+            # Freeze parameters
+            for param in self.model.parameters():
+                param.requires_grad = not(freeze_layers)
+
+            # Classification head
+            self.classifier = nn.Sequential(
+                nn.Dropout(self.dropout_rate),
+                nn.Linear(num_ftrs, self.num_classes)
+            )
+            # Ensure classifier is same weight
+            self.classifier = self.classifier.to(self.device)
+
+        elif self.model_type == 'ConvNeXt-base-pretrained-clip':
+            # load ConvNeXt CLIP backbone from ML foundations
+            self.model, _, preprocess = open_clip.create_model_and_transforms('convnext_base', pretrained='laion400m_s13b_b51k', device = self.device)
+            num_ftrs = self.model.visual.head.proj.out_features
+
+            # Freeze parameters
+            for param in self.model.parameters():
+                param.requires_grad = not(freeze_layers)
+
+            # Classification head
+            self.classifier = nn.Sequential(
+                nn.Dropout(self.dropout_rate),
+                nn.Linear(num_ftrs, self.num_classes)
+            )
+            # Ensure classifier is same weight
+            self.classifier = self.classifier.to(self.device)
 
         self.model = self.model.to(self.device)
 
     def forward(self, x):
-        outs = self.model(x)
+        if self.model_type in ['ViT-b32-pretrained-clip', 'ResNet-50-pretrained-clip', 'ConvNeXt-base-pretrained-clip']:
+            outs = self.model.encode_image(x)
+            outs = self.classifier(outs)
+        else:
+            outs = self.model(x)
         return outs
