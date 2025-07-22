@@ -221,7 +221,7 @@ def train(num_epochs, train_data_loader, val_data_loader, model, loss_fn, optimi
             print_("", verbose)
 
         # Check early stopping criteria
-        early_stopping(val_loss, model)
+        early_stopping(val_acc, model)
         if early_stopping.early_stop:
             print("Early stopping")
             break
