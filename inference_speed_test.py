@@ -12,15 +12,13 @@ from torch.utils.data import DataLoader
 import pandas as pd
 
 from deepfake_utils.models import MyModel
-# from deepfake_utils.datasets import DeepFakeDataset # <--- DeepFakeDataset no longer needed for dummy input
 
-# Configuration Variables (User MUST Update Paths & Parameters)
 
-# --- Model Weight Paths ---
+# Model Weight Paths 
 MODELS_TO_TEST = {
-    "ViT-b32-pretrained": {"weights": "model_weights/experiment_26.pth", "transform_type": "ViT", "dropout_rate": 0.0, "freeze_layers": False},
-    "ConvNeXt-base-pretrained": {"weights": "model_weights/experiment_1.pth", "transform_type": "ConvNeXt", "dropout_rate": 0.0, "freeze_layers": False},
-    "ResNet-50-pretrained": {"weights": "model_weights/experiment_33.pth", "transform_type": "ResNet", "dropout_rate": 0.0, "freeze_layers": False}
+    "ViT-b32-pretrained-clip": {"weights": "model_weights/experiment_44.pth", "transform_type": "ViT-CLIP", "dropout_rate": 0.0, "freeze_layers": False},
+    "ConvNeXt-base-pretrained-clip": {"weights": "model_weights/experiment_49.pth", "transform_type": "ConvNeXt-CLIP", "dropout_rate": 0.0, "freeze_layers": False},
+    "ResNet-50-pretrained-clip": {"weights": "model_weights/experiment_28.pth", "transform_type": "ResNet-CLIP", "dropout_rate": 0.0, "freeze_layers": False}
 }
 
 # Inference Test Parameters
@@ -31,7 +29,7 @@ NUM_TIMING_RUNS = 500
 
 # Plotting Configuration
 FIGURE_WIDTH = 3.25
-FIGURE_HEIGHT = FIGURE_WIDTH * 0.75
+FIGURE_HEIGHT = FIGURE_WIDTH
 DPI = 300
 FONTSIZE_TITLE = 10
 FONTSIZE_LABELS = 9
