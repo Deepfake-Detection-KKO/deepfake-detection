@@ -1,6 +1,10 @@
 import torch
 from torcheval.metrics import BinaryAUROC, BinaryAUPRC, BinaryAccuracy
 from torch.nn.functional import softmax
+from torch.amp import autocast, GradScaler
+from .earlystop import EarlyStopping
+
+scaler = GradScaler()
 
 def print_(message, log = True):
     if log:
@@ -49,13 +53,15 @@ def train_epoch(dataloader, model, loss_fn, optimizer,  device, verbose = True, 
         y = y.to(device)
 
         # forward pass
-        pred = model(X)
-        loss = loss_fn(pred, y)
-
-        # backward pass
-        loss.backward()
-        optimizer.step()
         optimizer.zero_grad()
+        with autocast(device_type = device.type, enabled = True):
+            pred = model(X)
+            loss = loss_fn(pred, y)
+        
+        # backward pass
+        scaler.scale(loss).backward()
+        scaler.step(optimizer)
+        scaler.update()
 
         # Accumulate metrics
         train_loss += loss.item()
@@ -117,25 +123,26 @@ def validate_epoch(dataloader, model, loss_fn, device, verbose = True, log_inter
     loss_fn.reduction = 'sum'
     
     # collect predictions from all data
-    with torch.no_grad():
-        for batch, (X, y) in enumerate(dataloader):
-            # move data to GPU
-            X = X.to(device)
-            y = y.to(device)
-
-            pred = model(X)
-            val_loss += loss_fn(pred, y).item()
+    with autocast(device_type = device.type, enabled = True):
+        with torch.no_grad():
+            for batch, (X, y) in enumerate(dataloader):
+                # move data to GPU
+                X = X.to(device)
+                y = y.to(device)
+                
+                pred = model(X)
+                val_loss += loss_fn(pred, y).item()
+                
+                # append batch predictions and labels
+                pred_prob = softmax(pred, dim = 1)
+                acc_metric.update(pred_prob[:, 1], y)
+                auroc_metric.update(pred_prob[:, 1], y)
+                auprc_metric.update(pred_prob[:, 1], y)
             
-            # append batch predictions and labels
-            pred_prob = softmax(pred, dim = 1)
-            acc_metric.update(pred_prob[:, 1], y)
-            auroc_metric.update(pred_prob[:, 1], y)
-            auprc_metric.update(pred_prob[:, 1], y)
-        
-            # Reduce logging
-            if (batch + 1) % log_interval == 0 or (batch + 1) == len(dataloader):
-                current = (batch + 1) * dataloader.batch_size
-                print_(f"\tEvaluation Progress: \t[{current:>5d}/{len(dataloader.dataset):>5d}]", verbose)
+                # Reduce logging
+                if (batch + 1) % log_interval == 0 or (batch + 1) == len(dataloader):
+                    current = (batch + 1) * dataloader.batch_size
+                    print_(f"\tEvaluation Progress: \t[{current:>5d}/{len(dataloader.dataset):>5d}]", verbose)
 
     # compute metrics over all samples
     val_loss /= len(dataloader.dataset)
@@ -183,6 +190,10 @@ def train(num_epochs, train_data_loader, val_data_loader, model, loss_fn, optimi
     """
     # setup to training history
     train_loss_, train_auroc_, train_auprc_, train_acc_, val_loss_, val_auroc_, val_auprc_, val_acc_ = [None] * num_epochs, [None] * num_epochs, [None] * num_epochs, [None] * num_epochs, [None] * num_epochs, [None] * num_epochs, [None] * num_epochs, [None] * num_epochs
+    # Initialize early stopping criteria
+    early_stopping = EarlyStopping(patience=5, delta=0.001)
+
+    # Start iterating over epochs
     for t in range(num_epochs):
         print_(f"Epoch {t+1}\n- - - - - - - - - - - - - - - - - - - - - - - - - ", verbose)
         
@@ -209,11 +220,20 @@ def train(num_epochs, train_data_loader, val_data_loader, model, loss_fn, optimi
             train_loss_[t], train_auroc_[t], train_auprc_[t], train_acc_[t], val_loss_[t], val_auroc_[t], val_auprc_[t], val_acc_[t] = train_loss, train_auroc, train_auprc, train_acc, val_loss, val_auroc, val_auprc, val_acc
             print_("", verbose)
 
+        # Check early stopping criteria
+        early_stopping(val_loss, model)
+        if early_stopping.early_stop:
+            print("Early stopping")
+            break
+
         # Apply learning rate schedule if provided
         if lr_scheduler:
             lr_scheduler.step()
+    
+    # Load weights with lowest validation loss
+    best_epoch = early_stopping.load_best_model(model)
         
     if device.type == 'mps':
-        return train_loss_, train_acc_, val_loss_, val_acc_
+        return train_loss_, train_acc_, val_loss_, val_acc_, best_epoch
     else:    
-        return train_loss_, train_auroc_, train_auprc_, train_acc_, val_loss_, val_auroc_, val_auprc_, val_acc_
+        return train_loss_, train_auroc_, train_auprc_, train_acc_, val_loss_, val_auroc_, val_auprc_, val_acc_, best_epoch

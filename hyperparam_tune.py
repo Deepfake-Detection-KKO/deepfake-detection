@@ -15,6 +15,12 @@ import time
 # Constants
 BATCH_SIZE = 64
 NUM_WORKERS = 8
+# OUTPUT_FILENAME = "experiment_results_resnet_imagenet.csv"
+OUTPUT_FILENAME = "experiment_results_resnet_clip.csv"
+# OUTPUT_FILENAME = "experiment_results_vit_imagenet.csv"
+# OUTPUT_FILENAME = "experiment_results_vit_clip.csv"
+# OUTPUT_FILENAME = "experiment_results_convnext_imagenet.csv"
+# OUTPUT_FILENAME = "experiment_results_convnext_clip.csv"
 
 # Enable TensorFloat32 for better performance on compatible GPUs
 torch.set_float32_matmul_precision('high')
@@ -38,26 +44,39 @@ device = torch.accelerator.current_accelerator()
 print(f'Using {device} accelerator \n')
 
 # Save Model Weights?
-save_model_weights = True
+save_model_weights = False
 
 # Loss function
 loss_fn = nn.CrossEntropyLoss(reduction = 'sum')
 
 # Hyperparameters TODO update
-model_types = ['ConvNeXt-base-pretrained', 'ViT-b32-pretrained', 'ResNet-50-pretrained']
-freeze_layers = [False, True]
-dropout_rates = [0, 0.2]
-l2_penalties = [0, 0.0001]
+# model_types = ['ResNet-50-pretrained']
+model_types = ['ResNet-50-pretrained-clip']
+# model_types = ['ViT-b32-pretrained']
+# model_types = ['ViT-b32-pretrained-clip']
+# model_types = ['ConvNeXt-base-pretrained']
+# model_types = ['ConvNeXt-base-pretrained-clip']
+# ('ResNet', 'ResNet-50-pretrained'), ('ResNet-CLIP', 'ResNet-50-pretrained-clip'), ('ViT', 'ViT-b32-pretrained'), ('ViT-CLIP', 'ViT-b32-pretrained-clip'), ('ConvNeXt', 'ConvNeXt-base-pretrained'), ('ConvNeXt-CLIP', 'ConvNeXt-base-pretrained-clip')
+freeze_layers = [False]
+dropout_rates = np.arange(0.2, 0.7, 0.1)
+l2_penalties = [0, 1e-4, 1e-3]
 optimizer_classes = [torch.optim.Adam]
-learning_rates = [1e-3]
-epochs_list = [10]
+learning_rates = [1e-5, 1e-4, 1e-3]
+epochs_list = [50]
 lr_scheduler_types = ['StepLR', 'CosineAnnealingWarmRestarts']
 
 experiment_id = 1
+total_experiments = len(model_types) * len(freeze_layers) * len(dropout_rates) * len(l2_penalties) * len(optimizer_classes) * len(learning_rates) * len(epochs_list) * len(lr_scheduler_types) + experiment_id - 1
 
 # Iterate through hyperparameters
 for model_type in model_types:
-    if "ViT" in model_type:
+    if "ViT" in model_type and "clip" in model_type:
+        transform_type = 'ViT-CLIP'
+    elif "ResNet" in model_type and "clip" in model_type:
+        transform_type = 'ResNet-CLIP'
+    elif "ConvNeXt" in model_type and "clip" in model_type:
+        transform_type = 'ConvNeXt-CLIP'
+    elif "ViT" in model_type:
         transform_type = 'ViT'
     elif "ResNet" in model_type:
         transform_type = 'ResNet'
@@ -102,10 +121,9 @@ for model_type in model_types:
                                     )
                                 
                                 # Train the model
-                                total_experiments = len(model_types) * len(freeze_layers) * len(dropout_rates) * len(l2_penalties) * len(optimizer_classes) * len(learning_rates) * len(epochs_list) * len(lr_scheduler_types)
                                 optimizer_name = optimizer_class.__name__
                                 print(f'Exp {experiment_id} of {total_experiments}: Model={model_type}, Optim={optimizer_name}, LR={learning_rate}, L2={l2_penalty}, Dropout={dropout_rate}, Scheduler={lr_scheduler_type}, Freeze={freeze_layer}')
-                                train_loss_history, train_roc_auc_history, train_pr_auc_history, train_acc_history, val_loss_history, val_roc_auc_history, val_pr_auc_history, val_acc_history = train(
+                                train_loss_history, train_roc_auc_history, train_pr_auc_history, train_acc_history, val_loss_history, val_roc_auc_history, val_pr_auc_history, val_acc_history, best_epoch = train(
                                     epochs,
                                     train_data_loader,
                                     val_data_loader,
@@ -133,19 +151,21 @@ for model_type in model_types:
                                     'val_roc_auc_history': [val_roc_auc_history], 
                                     'val_pr_auc_history': [val_pr_auc_history], 
                                     'val_acc_history': [val_acc_history],
-                                    'train_loss': [train_loss_history[-1]], 
-                                    'train_roc_auc': [train_roc_auc_history[-1]],
-                                    'train_pr_auc': [train_pr_auc_history[-1]], 
-                                    'train_acc': [train_acc_history[-1]], 
-                                    'val_loss': [val_loss_history[-1]], 
-                                    'val_roc_auc': [val_roc_auc_history[-1]], 
-                                    'val_pr_auc': [val_pr_auc_history[-1]], 
-                                    'val_acc': [val_acc_history[-1]],
+                                    'train_loss': [train_loss_history[best_epoch-1]], 
+                                    'train_roc_auc': [train_roc_auc_history[best_epoch-1]],
+                                    'train_pr_auc': [train_pr_auc_history[best_epoch-1]], 
+                                    'train_acc': [train_acc_history[best_epoch-1]], 
+                                    'val_loss': [val_loss_history[best_epoch-1]], 
+                                    'val_roc_auc': [val_roc_auc_history[best_epoch-1]], 
+                                    'val_pr_auc': [val_pr_auc_history[best_epoch-1]], 
+                                    'val_acc': [val_acc_history[best_epoch-1]],
                                 }
 
                                 # record and experiment results and save to csv
-                                output_filename = "experiment_results.csv"
-                                pd.DataFrame(experiment_record).to_csv(output_filename, mode = 'a', header = os.path.exists(output_filename) == False, index = False)
+                                if experiment_id == 1:
+                                    pd.DataFrame(experiment_record).to_csv(OUTPUT_FILENAME, index = False)
+                                else:
+                                    pd.DataFrame(experiment_record).to_csv(OUTPUT_FILENAME, mode = 'a', header = os.path.exists(OUTPUT_FILENAME) == False, index = False)
 
                                 end_time = time.time()
                                 print("Time taken:", (end_time - start_time)/60)
