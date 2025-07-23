@@ -16,9 +16,9 @@ from deepfake_utils.models import MyModel
 
 # Model Weight Paths 
 MODELS_TO_TEST = {
-    "ViT-b32-pretrained-clip": {"weights": "model_weights/experiment_44.pth", "transform_type": "ViT-CLIP", "dropout_rate": 0.0, "freeze_layers": False},
-    "ConvNeXt-base-pretrained-clip": {"weights": "model_weights/experiment_49.pth", "transform_type": "ConvNeXt-CLIP", "dropout_rate": 0.0, "freeze_layers": False},
-    "ResNet-50-pretrained-clip": {"weights": "model_weights/experiment_28.pth", "transform_type": "ResNet-CLIP", "dropout_rate": 0.0, "freeze_layers": False}
+    "ViT-b32-pretrained-clip": {"weights": "model_weights/experiment_weights_07212025_vit_clip_50.pth", "transform_type": "ViT-CLIP", "dropout_rate": 0.0, "freeze_layers": False},
+    "ConvNeXt-base-pretrained-clip": {"weights": "model_weights/experiment_weights_07212025_convnext_clip_2.pth", "transform_type": "ConvNeXt-CLIP", "dropout_rate": 0.0, "freeze_layers": False},
+    "ResNet-50-pretrained-clip": {"weights": "model_weights/experiment_weights_07212025_resnet_clip_51.pth", "transform_type": "ResNet-CLIP", "dropout_rate": 0.0, "freeze_layers": False}
 }
 
 # Inference Test Parameters
