@@ -1,0 +1,192 @@
+import os
+import pandas as pd
+import numpy as np
+
+import torch
+import torch.nn as nn
+from torch.utils.data import DataLoader
+
+from deepfake_utils.datasets import DeepFakeDataset
+from deepfake_utils.train import train
+from deepfake_utils.models import MyModel
+import random
+import time
+
+# Constants
+BATCH_SIZE = 64
+NUM_WORKERS = 8
+# OUTPUT_FILENAME = "experiment_results_resnet_scratch.csv"
+# OUTPUT_FILENAME = "experiment_results_resnet_imagenet.csv"
+# OUTPUT_FILENAME = "experiment_results_resnet_clip.csv"
+# OUTPUT_FILENAME = "experiment_results_vit_scratch.csv"
+# OUTPUT_FILENAME = "experiment_results_vit_imagenet.csv"
+# OUTPUT_FILENAME = "experiment_results_vit_clip.csv"
+# OUTPUT_FILENAME = "experiment_results_convnext_scratch.csv"
+# OUTPUT_FILENAME = "experiment_results_convnext_imagenet.csv"
+# OUTPUT_FILENAME = "experiment_results_convnext_clip.csv"
+OUTPUT_FILENAME = "experiment_results_best_models.csv"
+
+# Enable TensorFloat32 for better performance on compatible GPUs
+torch.set_float32_matmul_precision('high')
+
+# Set random seed
+SEED = 8
+random.seed(SEED)
+np.random.seed(SEED)
+torch.manual_seed(SEED)
+if torch.cuda.is_available():
+    torch.cuda.manual_seed(SEED)
+    torch.cuda.manual_seed_all(SEED)
+if torch.mps.is_available():
+    torch.mps.manual_seed(SEED)
+
+# Paths
+IMAGE_DIR_PATH = 'Deepfake-Eval-2024/image-data-rescaled'
+
+# Device
+device = torch.accelerator.current_accelerator()
+print(f'Using {device} accelerator \n')
+
+# Save Model Weights?
+save_model_weights = True
+
+# Loss function
+loss_fn = nn.CrossEntropyLoss(reduction = 'sum')
+
+# Hyperparameters TODO update
+# model_types = ['ResNet-50-scratch']
+# model_types = ['ResNet-50-pretrained']
+# model_types = ['ResNet-50-pretrained-clip']
+# model_types = ['ViT-b32-scratch']
+# model_types = ['ViT-b32-pretrained']
+# model_types = ['ViT-b32-pretrained-clip']
+# model_types = ['ConvNeXt-base-scratch']
+# model_types = ['ConvNeXt-base-pretrained']
+# model_types = ['ConvNeXt-base-pretrained-clip']
+# ('ResNet', 'ResNet-50-pretrained'), ('ResNet-CLIP', 'ResNet-50-pretrained-clip'), ('ViT', 'ViT-b32-pretrained'), ('ViT-CLIP', 'ViT-b32-pretrained-clip'), ('ConvNeXt', 'ConvNeXt-base-pretrained'), ('ConvNeXt-CLIP', 'ConvNeXt-base-pretrained-clip')
+
+# freeze_layers = [False]
+# dropout_rates = np.arange(0.2, 0.7, 0.1)
+# l2_penalties = [0, 1e-4, 1e-3]
+# optimizer_classes = [torch.optim.Adam]
+# learning_rates = [1e-5, 1e-4, 1e-3]
+# epochs_list = [50]
+# lr_scheduler_types = ['StepLR', 'CosineAnnealingWarmRestarts']
+
+# experiment_id = 1
+# total_experiments = len(model_types) * len(freeze_layers) * len(dropout_rates) * len(l2_penalties) * len(optimizer_classes) * len(learning_rates) * len(epochs_list) * len(lr_scheduler_types) + experiment_id - 1
+total_experiments = 3
+
+
+most_accurate_models = [
+      (49, 'ConvNeXt-base-pretrained-clip', False, 0.4, 0.001, torch.optim.Adam, 12, 0.00001, 'StepLR'),
+      (28, 'ResNet-50-pretrained-clip', False, 0.3, 0.0001, torch.optim.Adam, 50, 0.0001, 'CosineAnnealingWarmRestarts'),
+      (44, 'ViT-b32-pretrained-clip', False, 0.4, 0.0001, torch.optim.Adam, 50, 0.00001, 'CosineAnnealingWarmRestarts'),      
+]
+# Iterate through hyperparameters
+for experiment_id, model_type, freeze_layer, dropout_rate, l2_penalty, optimizer_class, epochs, learning_rate, lr_scheduler_type in most_accurate_models:
+# for model_type in model_types:
+    if "ViT" in model_type and "clip" in model_type:
+        transform_type = 'ViT-CLIP'
+    elif "ResNet" in model_type and "clip" in model_type:
+        transform_type = 'ResNet-CLIP'
+    elif "ConvNeXt" in model_type and "clip" in model_type:
+        transform_type = 'ConvNeXt-CLIP'
+    elif "ViT" in model_type:
+        transform_type = 'ViT'
+    elif "ResNet" in model_type:
+        transform_type = 'ResNet'
+    elif "ConvNeXt" in model_type:
+        transform_type  = 'ConvNeXt'
+    
+    # Load data
+    train_data = DeepFakeDataset("image-metadata-train.csv", IMAGE_DIR_PATH, transform_type, is_train = True)
+    train_data_loader = DataLoader(train_data, batch_size = BATCH_SIZE, shuffle = True, num_workers=NUM_WORKERS)
+
+    val_data = DeepFakeDataset("image-metadata-val.csv", IMAGE_DIR_PATH, transform_type, is_train = False)
+    val_data_loader = DataLoader(val_data, batch_size = BATCH_SIZE, shuffle = False, num_workers=NUM_WORKERS)
+
+    # for freeze_layer in freeze_layers:
+    #     for dropout_rate in dropout_rates:
+    #         for l2_penalty in l2_penalties:
+    #             for optimizer_class in optimizer_classes:
+    #                 for epochs in epochs_list:
+    #                     for learning_rate in learning_rates:
+    #                         for lr_scheduler_type in lr_scheduler_types:
+    start_time = time.time()
+
+    # Create model
+    model = MyModel(
+        model_type=model_type,
+        device=device,
+        dropout_rate=dropout_rate,
+        freeze_layers=freeze_layer
+    )
+    model = torch.compile(model)
+
+    # Optimizer and learning rate schedule
+    optimizer = optimizer_class(model.parameters(), lr=learning_rate, weight_decay=l2_penalty)
+    lr_scheduler = None
+    if lr_scheduler_type == 'CosineAnnealingWarmRestarts':
+        lr_scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(
+            optimizer, T_0=5, T_mult=1, eta_min=1e-6, last_epoch=-1
+        )
+    elif lr_scheduler_type == 'StepLR':
+        lr_scheduler = torch.optim.lr_scheduler.StepLR(
+            optimizer, step_size=2, gamma=0.5
+        )
+    
+    # Train the model
+    optimizer_name = optimizer_class.__name__
+    print(f'Exp {experiment_id} of {total_experiments}: Model={model_type}, Optim={optimizer_name}, LR={learning_rate}, L2={l2_penalty}, Dropout={dropout_rate}, Scheduler={lr_scheduler_type}, Freeze={freeze_layer}')
+    train_loss_history, train_roc_auc_history, train_pr_auc_history, train_acc_history, val_loss_history, val_roc_auc_history, val_pr_auc_history, val_acc_history, best_epoch = train(
+        epochs,
+        train_data_loader,
+        val_data_loader,
+        model,
+        loss_fn,
+        optimizer,
+        device,
+        lr_scheduler=lr_scheduler)
+    
+    experiment_record = {
+        'experiment_id': experiment_id,
+        'model': model_type,
+        'freeze_layers': freeze_layer,
+        'dropout_rate': dropout_rate,
+        'l2-penalty': l2_penalty,
+        'optimizer': optimizer_name,
+        'epochs': epochs,
+        'learning_rate': learning_rate,
+        'lr_scheduler_type': lr_scheduler_type,
+        'train_loss_history': [train_loss_history], 
+        'train_roc_auc_history': [train_roc_auc_history],
+        'train_pr_auc_history': [train_pr_auc_history], 
+        'train_acc_history': [train_acc_history], 
+        'val_loss_history': [val_loss_history], 
+        'val_roc_auc_history': [val_roc_auc_history], 
+        'val_pr_auc_history': [val_pr_auc_history], 
+        'val_acc_history': [val_acc_history],
+        'train_loss': [train_loss_history[best_epoch-1]], 
+        'train_roc_auc': [train_roc_auc_history[best_epoch-1]],
+        'train_pr_auc': [train_pr_auc_history[best_epoch-1]], 
+        'train_acc': [train_acc_history[best_epoch-1]], 
+        'val_loss': [val_loss_history[best_epoch-1]], 
+        'val_roc_auc': [val_roc_auc_history[best_epoch-1]], 
+        'val_pr_auc': [val_pr_auc_history[best_epoch-1]], 
+        'val_acc': [val_acc_history[best_epoch-1]],
+    }
+
+    # record and experiment results and save to csv
+    if experiment_id == 1:
+        pd.DataFrame(experiment_record).to_csv(OUTPUT_FILENAME, index = False)
+    else:
+        pd.DataFrame(experiment_record).to_csv(OUTPUT_FILENAME, mode = 'a', header = os.path.exists(OUTPUT_FILENAME) == False, index = False)
+
+    end_time = time.time()
+    print("Time taken:", (end_time - start_time)/60)
+    print()
+    if save_model_weights:
+        torch.save(model.state_dict(), f"experiment_{experiment_id}.pth")
+        
+    experiment_id += 1

@@ -15,12 +15,15 @@ import time
 # Constants
 BATCH_SIZE = 64
 NUM_WORKERS = 8
-# OUTPUT_FILENAME = "experiment_results_resnet_imagenet.csv"
-OUTPUT_FILENAME = "experiment_results_resnet_clip.csv"
-# OUTPUT_FILENAME = "experiment_results_vit_imagenet.csv"
-# OUTPUT_FILENAME = "experiment_results_vit_clip.csv"
-# OUTPUT_FILENAME = "experiment_results_convnext_imagenet.csv"
-# OUTPUT_FILENAME = "experiment_results_convnext_clip.csv"
+# OUTPUT_FILENAME = "experiment_results_07212025_resnet_scratch.csv"
+# OUTPUT_FILENAME = "experiment_results_07212025_resnet_imagenet.csv"
+# OUTPUT_FILENAME = "experiment_results_07212025_resnet_clip.csv"
+# OUTPUT_FILENAME = "experiment_results_07212025_vit_scratch.csv"
+# OUTPUT_FILENAME = "experiment_results_07212025_vit_imagenet.csv"
+# OUTPUT_FILENAME = "experiment_results_07212025_vit_clip.csv"
+# OUTPUT_FILENAME = "experiment_results_07212025_convnext_scratch.csv"
+OUTPUT_FILENAME = "experiment_results_07212025_convnext_imagenet.csv"
+# OUTPUT_FILENAME = "experiment_results_07212025_convnext_clip.csv"
 
 # Enable TensorFloat32 for better performance on compatible GPUs
 torch.set_float32_matmul_precision('high')
@@ -43,20 +46,23 @@ IMAGE_DIR_PATH = 'Deepfake-Eval-2024/image-data-rescaled'
 device = torch.accelerator.current_accelerator()
 print(f'Using {device} accelerator \n')
 
-# Save Model Weights?
-save_model_weights = False
+# # Save Model Weights?
+# save_model_weights = False
 
 # Loss function
 loss_fn = nn.CrossEntropyLoss(reduction = 'sum')
 
 # Hyperparameters TODO update
+# model_types = ['ResNet-50-scratch']
 # model_types = ['ResNet-50-pretrained']
-model_types = ['ResNet-50-pretrained-clip']
+# model_types = ['ResNet-50-pretrained-clip']
+# model_types = ['ViT-b32-scratch']
 # model_types = ['ViT-b32-pretrained']
 # model_types = ['ViT-b32-pretrained-clip']
-# model_types = ['ConvNeXt-base-pretrained']
+# model_types = ['ConvNeXt-base-scratch']
+model_types = ['ConvNeXt-base-pretrained']
 # model_types = ['ConvNeXt-base-pretrained-clip']
-# ('ResNet', 'ResNet-50-pretrained'), ('ResNet-CLIP', 'ResNet-50-pretrained-clip'), ('ViT', 'ViT-b32-pretrained'), ('ViT-CLIP', 'ViT-b32-pretrained-clip'), ('ConvNeXt', 'ConvNeXt-base-pretrained'), ('ConvNeXt-CLIP', 'ConvNeXt-base-pretrained-clip')
+
 freeze_layers = [False]
 dropout_rates = np.arange(0.2, 0.7, 0.1)
 l2_penalties = [0, 1e-4, 1e-3]
@@ -67,6 +73,18 @@ lr_scheduler_types = ['StepLR', 'CosineAnnealingWarmRestarts']
 
 experiment_id = 1
 total_experiments = len(model_types) * len(freeze_layers) * len(dropout_rates) * len(l2_penalties) * len(optimizer_classes) * len(learning_rates) * len(epochs_list) * len(lr_scheduler_types) + experiment_id - 1
+
+best_val_acc = {
+    'ResNet-50-pretrained': 0,
+    'ResNet-50-pretrained-clip': 0,
+    'ResNet-50-scratch': 0,
+    'ViT-b32-pretrained': 0,
+    'ViT-b32-pretrained-clip': 0,
+    'ViT-b32-scratch': 0,
+    'ConvNeXt-base-pretrained': 0,
+    'ConvNeXt-base-pretrained-clip': 0,
+    'ConvNeXt-base-scratch': 0
+}
 
 # Iterate through hyperparameters
 for model_type in model_types:
@@ -170,7 +188,12 @@ for model_type in model_types:
                                 end_time = time.time()
                                 print("Time taken:", (end_time - start_time)/60)
                                 print()
-                                if save_model_weights:
-                                    torch.save(model.state_dict(), f"experiment_{experiment_id}.pth")
+                                if val_acc_history[best_epoch-1] > best_val_acc[model_type]:
+                                    print("New best accuracy:", val_acc_history[best_epoch-1])
+                                    start_time = time.time()
+                                    torch.save(model.state_dict(), f"{OUTPUT_FILENAME.replace(".csv","").replace("results", "weights")}_{experiment_id}.pth")
+                                    end_time = time.time()
+                                    print("Time taken saving model:", (end_time - start_time)/60)
+                                    best_val_acc[model_type] = val_acc_history[best_epoch-1]
                                     
                                 experiment_id += 1
