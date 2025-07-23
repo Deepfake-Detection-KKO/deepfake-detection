@@ -1,4 +1,5 @@
 import os
+import open_clip
 import torch
 from torch.utils.data import Dataset
 
@@ -21,7 +22,7 @@ if hasattr(torch.mps, "is_available") and torch.mps.is_available():
     torch.mps.manual_seed(SEED) 
 
 class DeepFakeDataset(Dataset):
-    def __init__(self, metadata_path: str, image_dir_path: str, model_type: str, is_train: bool = True, return_metadata = False):
+    def __init__(self, metadata_path: str, image_dir_path: str, model_type: str, is_train: bool = True, return_metadata = False, device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")):
         """
         Dataset subclass which preprocesses deepfakes
         
@@ -51,8 +52,14 @@ class DeepFakeDataset(Dataset):
             self.base_transforms = ViT_B_32_Weights.DEFAULT.transforms()
         elif self.model_type == 'ConvNeXt':
             self.base_transforms = ConvNeXt_Base_Weights.DEFAULT.transforms()
+        elif self.model_type == 'ResNet-CLIP':
+            _, _, self.base_transforms = open_clip.create_model_and_transforms('RN50', pretrained='cc12m', device = device)
+        elif self.model_type == 'ViT-CLIP':
+            _, _, self.base_transforms = open_clip.create_model_and_transforms('ViT-B-32', pretrained='laion2b_s34b_b79k', device = device)
+        elif self.model_type == 'ConvNeXt-CLIP':
+            _, _, self.base_transforms = open_clip.create_model_and_transforms('convnext_base', pretrained='laion400m_s13b_b51k', device = device)
 
-        if self.model_type not in ['ResNet', 'ViT', 'ConvNeXt']:
+        if self.model_type not in ['ResNet', 'ViT', 'ConvNeXt', 'ResNet-CLIP', 'ViT-CLIP', 'ConvNeXt-CLIP']:
             # Training transforms (includes randomization to augment data for each epoch)
             self.train_transform = transforms.Compose([
                 transforms.RandomResizedCrop(size=224, scale=(0.5, 1.0)), # Randomly crop image NOTE: size can be changed if not resnet / ViT

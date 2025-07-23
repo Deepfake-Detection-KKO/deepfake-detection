@@ -1,4 +1,4 @@
-name: cs7643
+name: /home/hice1/$USER/scratch/cs7643
 channels:
   - anaconda
   - defaults
@@ -238,4 +238,6 @@ dependencies:
       - torcheval==0.0.7
       - torchvision==0.22.1
       - triton==3.3.1
+      - git+https://github.com/openai/CLIP.git
+      - open_clip_torch
 prefix: /home/hice1/$USER/scratch/cs7643
