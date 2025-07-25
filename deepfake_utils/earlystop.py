@@ -10,8 +10,9 @@ class EarlyStopping:
         self.epoch = 0
         self.best_model_state = None
 
-    def __call__(self, val_loss, model):
-        score = -val_loss # Invert loss so higher score is better
+    def __call__(self, val_score, model):
+        # score = -val_score # Invert loss so higher score is better
+        score = val_score # Don't invert for accuracy
         self.epoch += 1
 
         if self.best_score is None: # Save model weights from 1st epoch

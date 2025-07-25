@@ -1,4 +1,3 @@
-import clip
 import open_clip
 import torch.nn as nn
 from torchvision.models import resnet50, ResNet50_Weights, vit_b_32, ViT_B_32_Weights, convnext_base, ConvNeXt_Base_Weights

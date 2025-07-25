@@ -1,5 +1,4 @@
 import os
-import clip
 import open_clip
 import torch
 from torch.utils.data import Dataset
@@ -54,9 +53,9 @@ class DeepFakeDataset(Dataset):
         elif self.model_type == 'ConvNeXt':
             self.base_transforms = ConvNeXt_Base_Weights.DEFAULT.transforms()
         elif self.model_type == 'ResNet-CLIP':
-            _, self.base_transforms = clip.load("RN50", device)
+            _, _, self.base_transforms = open_clip.create_model_and_transforms('RN50', pretrained='cc12m', device = device)
         elif self.model_type == 'ViT-CLIP':
-            _, self.base_transforms = clip.load("ViT-B/32", device)
+            _, _, self.base_transforms = open_clip.create_model_and_transforms('ViT-B-32', pretrained='laion2b_s34b_b79k', device = device)
         elif self.model_type == 'ConvNeXt-CLIP':
             _, _, self.base_transforms = open_clip.create_model_and_transforms('convnext_base', pretrained='laion400m_s13b_b51k', device = device)
 
